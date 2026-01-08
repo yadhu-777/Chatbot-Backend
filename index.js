@@ -17,7 +17,8 @@ import { OAuth2Client } from"google-auth-library";
 const Client = new OAuth2Client(process.env.CLIENT_ID);
 
 app.use(cors({
-  origin:"https://chatbot-frontend-orcin-ten.vercel.app/"  ,
+  origin:"https://chatbot-frontend-orcin-ten.vercel.app"
+    ,
   credentials: true,
 }));
 app.use(cookieParser());
