@@ -89,8 +89,9 @@ const token = jwt.sign(
 );
 
   res.cookie("auth",token,{
- secure: true,    
-  sameSite: "lax",   
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",   
   path: "/",     
   })
  res.send({mesage:"ok",name:name,email:email,thrid:Threds.userId})
