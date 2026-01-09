@@ -67,15 +67,14 @@ const token = jwt.sign(
 );
 
   res.cookie("auth",token,{
- secure: true,    
-  sameSite: "lax",   
-  path: "/",     
+ secure: true,  
+ httpOnly:true, 
+  sameSite: "none",   
+   maxAge: 7 * 24 * 60 * 60 * 1000
   })
  res.send({mesage:"ok",name:name,email:email});
  return
 }
-
-
   const Threds = new userThrread({
     userId:uuidv4(),
     Email:email
