@@ -31,7 +31,11 @@ app.delete("/delcookie",async(req,res)=>{
     if(!cookie){
       return res.json({message:"not logged In"})
     }else{
-res.cookie("auth"," ");
+res.clearCookie("auth",{
+   secure: true,  
+httpOnly:true,
+  sameSite: "none", 
+})
 return res.json({message:"logged out"})
     }
   }catch(err){
@@ -99,7 +103,7 @@ const token = jwt.sign(
 
   res.cookie("auth",token,{
  secure: true,  
-httpOnly:false,
+httpOnly:true,
   sameSite: "none",   
    maxAge: 7 * 24 * 60 * 60 * 1000
   })
