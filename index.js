@@ -61,29 +61,7 @@ threadId:idd
   res.send({message:"deleted"});
 })
 
-app.post("/verify",async(req,res)=>{
-  const cookie = req.cookies.auth;
-  
-try{
- if(cookie){
-   const decoded = jwt.verify(
-    cookie,
-      process.env.JWT_SECRET
-  )
-  
 
-  return  res.json({message:"ok",content:decoded})
- }
-
- if(!cookie){
-return res.json({message:"an error occured"})
-  }
- 
-  
-}catch(err){
-  return res.send({message:"loggin to your account"})
-}
-})
 app.post("/vauth",async(req,res)=>{
   
   const {tknId} = req.body;
@@ -112,8 +90,8 @@ httpOnly:true,
   sameSite: "none",   
    maxAge: 7 * 24 * 60 * 60 * 1000
   })
- res.send({mesage:"ok",name:name,email:email});
- return
+return res.send({mesage:"ok",name:name,email:email});
+ 
 }
   const Threds = new userThrread({
     userId:uuidv4(),
@@ -122,7 +100,7 @@ httpOnly:true,
   await Threds.save();
   let ids = Threds.userId;
  const token = jwt.sign(
-  { name,email },        
+  email ,        
   process.env.JWT_SECRET, 
   { expiresIn: "7d" }   
 );
@@ -133,13 +111,35 @@ httpOnly:true,
   sameSite: "none",   
        maxAge: 7 * 24 * 60 * 60 * 1000
   })
- res.send({mesage:"ok",name:name,email:email,thrid:Threds.userId})
+return res.send({mesage:"ok",name:name,email:email,thrid:Threds.userId})
   }catch(err){
     console.log(err)
   }
 
 })
+app.post("/verify",async(req,res)=>{
+  const cookie = req.cookies.auth;
+  
+try{
+ if(cookie){
+   const decoded = jwt.verify(
+    cookie,
+      process.env.JWT_SECRET
+  )
+  
 
+  return  res.json({message:"ok",content:decoded})
+ }
+
+ if(!cookie){
+return res.json({message:"an error occured"})
+  }
+ 
+  
+}catch(err){
+  return res.send({message:"loggin to your account"})
+}
+})
 
 app.post("/fetchChat",async(req,res)=>{
   const {ThreadId,userId} = req.body;
