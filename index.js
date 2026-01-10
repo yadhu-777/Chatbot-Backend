@@ -91,7 +91,7 @@ const verify = await Client.verifyIdToken({
   const payload = verify.getPayload();
   const name = payload.name;
   const email = payload.email;
-  
+  console.log(email);
 
 const userFind = await userThrread.findOne({Email:email});
 if(userFind){
