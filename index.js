@@ -133,12 +133,12 @@ try{
  }
 
  if(!cookie){
-return res.json({message:"an error occured"})
+return res.json({message:"loggin to your account"})
   }
  
   
 }catch(err){
-  return res.send({message:"loggin to your account"})
+  return res.send({message:"verification error "})
 }
 })
 
