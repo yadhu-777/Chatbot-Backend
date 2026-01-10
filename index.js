@@ -58,7 +58,7 @@ res.json({message:"an error occured"})
   res.json({message:"ok",content:decoded})
   
 }catch(err){
-  res.send({error:"error in verification"})
+  res.send({message:"error in verification"})
 }
 })
 app.post("/vauth",async(req,res)=>{
