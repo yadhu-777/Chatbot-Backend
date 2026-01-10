@@ -34,6 +34,7 @@ res.clearCookie("auth",{
    secure: true,  
 httpOnly:true,
   sameSite: "none", 
+    path: "/",
 })
 return res.json({message:"logged out"})
     }
