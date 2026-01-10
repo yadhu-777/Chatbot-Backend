@@ -109,7 +109,7 @@ const token = jwt.sign(
 
   res.cookie("auth",token,{
  secure: true,  
-httpOnly:false,
+httpOnly:true,
   sameSite: "none",   
    maxAge: 7 * 24 * 60 * 60 * 1000
   })
@@ -130,7 +130,7 @@ httpOnly:false,
 
   res.cookie("auth",token,{
   httpOnly: true,
-  secure: false,
+  secure: true,
   sameSite: "none",   
        maxAge: 7 * 24 * 60 * 60 * 1000
   })
