@@ -31,7 +31,7 @@ app.delete("/delcookie",async(req,res)=>{
     if(!cookie){
       return res.json({message:"not logged In"})
     }else{
-res.cookie(" ");
+res.cookie("auth"," ");
 return res.json({message:"logged out"})
     }
   }catch(err){
