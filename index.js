@@ -91,7 +91,7 @@ const verify = await Client.verifyIdToken({
   const payload = verify.getPayload();
   const name = payload.name;
   const email = payload.email;
-  console.log(email);
+ 
 
 const userFind = await userThrread.findOne({Email:email});
 if(userFind){
@@ -124,9 +124,8 @@ httpOnly:false,
 
   res.cookie("auth",token,{
   httpOnly: true,
-  secure: true,
-  sameSite: "none",   
-  path: "/",     
+  secure: false,
+  
   })
  res.send({mesage:"ok",name:name,email:email,thrid:Threds.userId})
   }catch(err){
