@@ -71,7 +71,7 @@ try{
       process.env.JWT_SECRET
   )
   if(!cookie){
-res.json({message:"an error occured"})
+return res.json({message:"an error occured"})
   }
   res.json({message:"ok",content:decoded})
   
