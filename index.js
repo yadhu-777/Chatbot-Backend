@@ -25,6 +25,20 @@ app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+app.delete("/delcookie",async(req,res)=>{
+  const cookie = req.cookies.auth;
+  try{
+    if(!cookie){
+      return res.json({message:"not logged In"})
+    }else{
+res.cookie(" ");
+return res.json({message:"logged out"})
+    }
+  }catch(err){
+    return res.json({message:err})
+  }
+})
+
 app.delete("/delThread",async(req,res)=>{
  const {userId,idd} = req.body;
  console.log(userId,idd)
@@ -62,7 +76,7 @@ res.json({message:"an error occured"})
 }
 })
 app.post("/vauth",async(req,res)=>{
-  console.log("came")
+  
   const {tknId} = req.body;
   const idToken = tknId;
   try{
