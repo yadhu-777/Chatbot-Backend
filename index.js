@@ -79,7 +79,7 @@ const verify = await Client.verifyIdToken({
 const userFind = await userThrread.findOne({Email:email});
 if(userFind){
 const token = jwt.sign(
-   email ,        
+   {email} ,        
   process.env.JWT_SECRET, 
   { expiresIn: "7d" }   
 );
@@ -100,7 +100,7 @@ return res.send({mesage:"ok",name:name,email:email});
   await Threds.save();
   let ids = Threds.userId;
  const token = jwt.sign(
-  email ,        
+  {email} ,        
   process.env.JWT_SECRET, 
   { expiresIn: "7d" }   
 );
