@@ -17,31 +17,30 @@ import { OAuth2Client } from"google-auth-library";
 const Client = new OAuth2Client(process.env.CLIENT_ID);
 
 app.use(cors({
-  origin:"https://chatbot-frontend-orcin-ten.vercel.app"
-    ,
+  origin:"https://chatbot-frontend-orcin-ten.vercel.app",
   credentials: true,
 }));
 app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
-// app.delete("/delcookie",async(req,res)=>{
-//   const cookie = req.cookies.auth;
-//   try{
-//     if(!cookie){
-//       return res.json({message:"not logged In"})
-//     }else{
-// res.clearCookie("auth",{
-//    secure: true,  
-// httpOnly:true,
-//   sameSite: "none", 
-// })
-// return res.json({message:"logged out"})
-//     }
-//   }catch(err){
-//     return res.json({message:err})
-//   }
-// })
+app.delete("/delcookie",async(req,res)=>{
+  const cookie = req.cookies.auth;
+  try{
+    if(!cookie){
+      return res.json({message:"not logged In"})
+    }else{
+res.clearCookie("auth",{
+   secure: true,  
+httpOnly:true,
+  sameSite: "none", 
+})
+return res.json({message:"logged out"})
+    }
+  }catch(err){
+    return res.json({message:err})
+  }
+})
 
 app.delete("/delThread",async(req,res)=>{
  const {userId,idd} = req.body;
@@ -130,7 +129,7 @@ httpOnly:true,
 
   res.cookie("auth",token,{
   httpOnly: true,
-  secure: true,
+  secure:true ,
   sameSite: "none",   
        maxAge: 7 * 24 * 60 * 60 * 1000
   })
