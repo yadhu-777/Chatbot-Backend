@@ -73,7 +73,9 @@ try{
   if(!cookie){
 return res.json({message:"an error occured"})
   }
-  res.json({message:"ok",content:decoded})
+ if(decoded){
+   res.json({message:"ok",content:decoded})
+ }
   
 }catch(err){
   return res.send({message:"loggin to your account"})
