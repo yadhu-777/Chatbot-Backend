@@ -66,16 +66,20 @@ app.post("/verify",async(req,res)=>{
   const cookie = req.cookies.auth;
   
 try{
-  const decoded = jwt.verify(
+ if(cookie){
+   const decoded = jwt.verify(
     cookie,
       process.env.JWT_SECRET
   )
-  if(!cookie){
+  
+
+  return  res.json({message:"ok",content:decoded})
+ }
+
+ if(!cookie){
 return res.json({message:"an error occured"})
   }
- if(decoded){
-   res.json({message:"ok",content:decoded})
- }
+ 
   
 }catch(err){
   return res.send({message:"loggin to your account"})
