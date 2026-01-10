@@ -27,9 +27,7 @@ app.use(express.urlencoded({extended:true}))
 app.delete("/delcookie",async(req,res)=>{
   const cookie = req.cookies.auth;
   try{
-    if(!cookie){
-      return res.json({message:"not logged In"})
-    }else{
+   
 res.clearCookie("auth",{
    secure: true,  
 httpOnly:true,
@@ -37,7 +35,7 @@ httpOnly:true,
     path: "/",
 })
 return res.json({message:"logged out"})
-    }
+    
   }catch(err){
     return res.json({message:err})
   }
