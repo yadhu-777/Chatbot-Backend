@@ -164,7 +164,7 @@ res.send({recData:UserData})
 
 app.post("/threads",async(req,res)=>{
   const{userId} = req.body;
-  console.log(userId)
+  
   try{
 const Threadval = await userThrread.aggregate([
   { $match: { Email: userId } },
@@ -173,8 +173,8 @@ const Threadval = await userThrread.aggregate([
  
 ]);
 
-  console.log(Threadval)
-   res.send({threads:Threadval});
+ 
+   res.json({threads:Threadval});
   }catch(err){
 console.log("err",err)
   }
