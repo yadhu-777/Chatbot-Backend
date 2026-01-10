@@ -44,6 +44,23 @@ threadId:idd
   res.send({message:"deleted"});
 })
 
+app.post("/verify",async(req,res)=>{
+  const cookie = req.cookies.auth;
+  
+try{
+  const decoded = jwt.verify(
+    cookie,
+      process.env.JWT_SECRET
+  )
+  if(!cookie){
+res.json({message:"an error occured"})
+  }
+  res.json({message:"ok",content:decoded})
+  
+}catch(err){
+  res.send({error:"error in verification"})
+}
+})
 app.post("/vauth",async(req,res)=>{
   console.log("came")
   const {tknId} = req.body;
@@ -61,7 +78,7 @@ const verify = await Client.verifyIdToken({
 const userFind = await userThrread.findOne({Email:email});
 if(userFind){
 const token = jwt.sign(
-  { name,email },        
+   email ,        
   process.env.JWT_SECRET, 
   { expiresIn: "7d" }   
 );
