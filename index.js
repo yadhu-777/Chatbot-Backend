@@ -50,7 +50,7 @@ app.post("/delThread",async(req,res)=>{
     }
 try {
 
-    const user = await userThrread.findOne({ userId });
+    const user = await userThrread.findOne({ Email:userId });
     
     if (!user) {
       return res.status(404).json({ message: "User not found" });
