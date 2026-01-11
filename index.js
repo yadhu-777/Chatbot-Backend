@@ -52,7 +52,7 @@ try{
     const result = await userThrread.findOneAndUpdate(
     {userId},
     {
-    $pop:{
+    $pullAll:{
         thread:{
 threadId:idd
 
