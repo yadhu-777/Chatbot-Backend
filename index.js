@@ -49,7 +49,7 @@ app.delete("/delThread",async(req,res)=>{
     }
 try{
     const del = await userThrread.updateOne(
-    {userId:userId},
+    {userId},
     {
       $pull:{
         thread:{
@@ -60,11 +60,12 @@ threadId:idd
     }
 
   );
+   return res.send({message:"deleted"});
 }catch(err){
    return res.send({message:err});
 }
   
- return res.send({message:"deleted"});
+
 })
 
 
