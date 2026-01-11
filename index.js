@@ -189,14 +189,7 @@ const response = await client.responses.create({
   model: "gpt-4o-mini",
   input: inp,
 });
-if(!threadID){
-  
-    const response2 = await client.responses.create({
-  model: "gpt-4o-mini",
-  input: `Generate a 3–5 word chat title summarizing this message.
-No quotes. No punctuation. ${inp}`,
-});
-}
+
 
 if(threadID && userId){
 
@@ -221,6 +214,13 @@ const UplUser = await userThrread.updateOne(
 
 }else{
   
+
+  
+    const response2 = await client.responses.create({
+  model: "gpt-4o-mini",
+  input: `Generate a 3–5 word chat title summarizing this message.
+No quotes. No punctuation. ${inp}`,
+});
 
 
 const UplUser = await userThrread.findOne({Email:userId});
