@@ -48,18 +48,19 @@ app.post("/delThread",async(req,res)=>{
    if (!userId || !idd) {
       return res.status(400).json({ message: "Missing data" });
     }
-try{
-    const result = await userThrread.findOneAndUpdate(
-    {userId},
-    {
-    $pull:{
-       thread: { threadId: String(idd) }
-      }
+try {
+
+    const user = await userThrread.findOne({ userId });
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-  );
-   console.log(result); 
-   return res.send({message:"deleted"});
+    const result = await userThrread.updateOne(
+      { userId: userId },
+      { $pull: { thread: { threadId: String(idd) } } }
+    );
+    return res.status(200).json({ message: "deleted" });
 }catch(err){
    return res.send({message:err});
 }
