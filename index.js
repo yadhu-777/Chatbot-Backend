@@ -41,7 +41,7 @@ return res.json({message:"logged out"})
   }
 })
 
-app.delete("/delThread",async(req,res)=>{
+app.post("/delThread",async(req,res)=>{
  const {userId,idd} = req.body;
  console.log(userId,idd)
    if (!userId || !idd) {
