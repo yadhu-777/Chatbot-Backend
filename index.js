@@ -57,8 +57,8 @@ try {
     }
 
     const result = await userThrread.updateOne(
-      { userId: userId },
-      { $pull: { thread: { threadId: String(idd) } } }
+      { Email: userId },
+      { $pull: { thread: { threadId: idd } } }
     );
     return res.status(200).json({ message: "deleted" });
 }catch(err){
