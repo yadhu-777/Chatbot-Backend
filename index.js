@@ -48,7 +48,7 @@ app.post("/delThread",async(req,res)=>{
       return res.status(400).json({ message: "Missing data" });
     }
 try{
-    const result = await userThrread.updateOne(
+    const result = await userThrread.findOneAndUpdate(
     {userId},
     {
       $pull:{
