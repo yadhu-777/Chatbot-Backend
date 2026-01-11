@@ -57,7 +57,7 @@ threadId:idd
 
   );
   
-  res.send({message:"deleted"});
+ return res.send({message:"deleted"});
 })
 
 
