@@ -52,7 +52,7 @@ try{
     const result = await userThrread.findOneAndUpdate(
     {userId},
     {
-    $pullAll:{
+    $pull:{
         thread:{
 threadId:idd
 
