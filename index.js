@@ -53,10 +53,7 @@ try{
     {userId},
     {
     $pull:{
-        thread:{
-threadId:idd
-
-        }
+       thread: { threadId: String(idd) }
       }
     }
 
