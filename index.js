@@ -44,7 +44,11 @@ return res.json({message:"logged out"})
 app.delete("/delThread",async(req,res)=>{
  const {userId,idd} = req.body;
  console.log(userId,idd)
-  const del = await userThrread.updateOne(
+   if (!userId || !idd) {
+      return res.status(400).json({ message: "Missing data" });
+    }
+try{
+    const del = await userThrread.updateOne(
     {userId:userId},
     {
       $pull:{
@@ -56,6 +60,9 @@ threadId:idd
     }
 
   );
+}catch(err){
+   return res.send({message:err});
+}
   
  return res.send({message:"deleted"});
 })
