@@ -127,7 +127,7 @@ try{
   )
   
 
-  return  res.json({message:`hi ${decoded.name}`,content:decoded})
+  return  res.json({message:`hii ${decoded.name}`,content:decoded})
  }
 
  if(!cookie){
