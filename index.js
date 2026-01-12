@@ -232,9 +232,9 @@ No quotes. No punctuation. ${inp}`,
 
 
 const UplUser = await userThrread.findOne({Email:userId});
-
+const threadId =  uuidv4();
 UplUser.thread.push({
-  threadId: uuidv4(),
+  threadId,
   title:response2.output_text,
   messages: [
     { role: "User", message: inp },
