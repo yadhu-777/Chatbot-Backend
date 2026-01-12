@@ -247,7 +247,7 @@ await UplUser.save();
 
 
 
-return res.json({message:response.output_text,thrId:UplUser.thread.threadId})
+return res.json({message:response.output_text,thrId:threadId})
 
 }
 
