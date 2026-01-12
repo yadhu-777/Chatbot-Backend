@@ -218,7 +218,7 @@ const UplUser = await userThrread.updateOne(
     }
     }
 )
-
+return res.json({message:response.output_text,thrId:th})
 
 }else{
   
@@ -247,10 +247,10 @@ await UplUser.save();
 
 
 
-
+return res.json({message:response.output_text,thrId:UplUser.thread.threadId})
 
 }
-res.send({message:response.output_text,thrId:th})
+
 })
 function connect(){
   mongoose.connect(process.env.mongo)
