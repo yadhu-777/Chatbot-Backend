@@ -24,6 +24,14 @@ app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+
+app.post("/data",async(req,res)=>{
+  const{details,details2} = req.body;
+   console.log(details);
+   console.log(details2);
+   res.json({details:details});
+})
+
 app.delete("/delcookie",async(req,res)=>{
   const cookie = req.cookies.auth;
   try{
