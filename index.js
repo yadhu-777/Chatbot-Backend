@@ -36,7 +36,7 @@ const insert = new UserPass({
 });
  await insert.save();
    
-  
+  res.json({message:"done"});
 })
 
 app.delete("/delcookie",async(req,res)=>{
