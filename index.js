@@ -29,7 +29,7 @@ app.use(express.urlencoded({extended:true}))
 
 app.post("/data",async(req,res)=>{
  const{email,password} = req.body.content;
- const hashPass = await bcrypt.hash(10,password);
+ const hashPass = await bcrypt.hash(password,10);
 const insert = new UserPass({
   email:email,
   password:hashPass
