@@ -34,7 +34,7 @@ const insert = new UserPass({
   email:email,
   password:hashPass
 });
- await hashPass.save();
+ await insert.save();
    
   
 })
