@@ -7,12 +7,14 @@ import OpenAI from "openai";
 import { v4 as uuidv4 } from "uuid";
 import mongoose from "mongoose";
 import cookieParser  from"cookie-parser";
-
+import UserPass from "./Schema/Credentials.js"; 
 import userThrread from "./Schema/User.js";
 import jwt from "jsonwebtoken";  
 const client = new OpenAI({
     apiKey:process.env.Open_key
 });
+import bcrypt  from "bcrypt";
+
 import { OAuth2Client } from"google-auth-library";
 const Client = new OAuth2Client(process.env.CLIENT_ID);
 
@@ -26,10 +28,15 @@ app.use(express.urlencoded({extended:true}))
 
 
 app.post("/data",async(req,res)=>{
-  const{details,details2} = req.body;
-   console.log(details);
-   console.log(details2);
-   res.json({details:details});
+ const{email,password} = req.body.content;
+ const hashPass = await bcrypt.hash(10,password);
+const insert = new UserPass({
+  email:email,
+  password:hashPass
+});
+ await hashPass.save();
+   
+  
 })
 
 app.delete("/delcookie",async(req,res)=>{

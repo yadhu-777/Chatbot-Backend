@@ -10,7 +10,8 @@ userId:{
 Email:{
     type:String
 },
-thread:[thread]
+thread:[thread],
+
 
 });
 
