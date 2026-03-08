@@ -35,7 +35,7 @@ if(!find){
  return  res.status(404).json({message:"Not Registered"})
 }
 
-  const match = await bcrypt.compare(password, user.password);
+  const match = await bcrypt.compare(password, find.password);
 if(!match){
   return res.json({message:"Email or Password is wrong"})
   
