@@ -34,7 +34,8 @@ const find = await UserPass.findOne({email:email});
 if(!find){
  return  res.status(404).json({message:"Not Registered"})
 }
-const match = bcrypt.compare(password,find.password)
+
+  const match = await bcrypt.compare(password, user.password);
 if(match){
    return  res.json({message:"Authentication Success"});
 
