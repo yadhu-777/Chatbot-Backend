@@ -29,12 +29,19 @@ app.use(express.urlencoded({extended:true}))
 
 app.post("/data",async(req,res)=>{
  const{email,password} = req.body.content;
-const find = await UserPass.find({email:email});
+const find = await UserPass.findOne({email:email});
+
 if(!find){
-   res.status(404).json({message:"Wrong Email or Password"})
-}else{
-   res.json({message:"done"});
+ return  res.status(404).json({message:"Wrong Email or Password"})
 }
+const match = bcrypt.compare(password,find.password)
+if(!match){
+return res.status(404).json({message:"Email or Password is wrong"})
+}else{
+ return  res.json({message:"Authentication Success"});
+}
+ 
+
  
 })
 
