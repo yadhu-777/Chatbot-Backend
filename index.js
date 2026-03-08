@@ -32,13 +32,14 @@ app.post("/data",async(req,res)=>{
 const find = await UserPass.findOne({email:email});
 
 if(!find){
- return  res.status(404).json({message:"Wrong Email or Password"})
+ return  res.status(404).json({message:"Not Registered"})
 }
 const match = bcrypt.compare(password,find.password)
-if(!match){
-return res.status(404).json({message:"Email or Password is wrong"})
+if(match){
+   return  res.json({message:"Authentication Success"});
+
 }else{
- return  res.json({message:"Authentication Success"});
+return res.status(404).json({message:"Email or Password is wrong"})
 }
  
 
