@@ -37,7 +37,7 @@ if(!find){
 
   const match = await bcrypt.compare(password, user.password);
 if(!match){
-  return res.status(404).json({message:"Email or Password is wrong"})
+  return res.json({message:"Email or Password is wrong"})
   
 
 }else{
