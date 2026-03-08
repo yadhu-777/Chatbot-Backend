@@ -29,14 +29,13 @@ app.use(express.urlencoded({extended:true}))
 
 app.post("/data",async(req,res)=>{
  const{email,password} = req.body.content;
- const hashPass = await bcrypt.hash(password,10);
-const insert = new UserPass({
-  email:email,
-  password:hashPass
-});
- await insert.save();
-   
-  res.json({message:"done"});
+const find = await UserPass.find({email:email});
+if(!find){
+   res.status(404).json({message:"Wrong Email or Password"})
+}else{
+   res.json({message:"done"});
+}
+ 
 })
 
 app.delete("/delcookie",async(req,res)=>{
