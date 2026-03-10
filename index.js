@@ -9,7 +9,7 @@ import mongoose from "mongoose";
 import cookieParser  from"cookie-parser";
 import UserPass from "./Schema/Credentials.js"; 
 import userThrread from "./Schema/User.js";
-import jwt from "jsonwebtoken";  
+import jwt, { decode } from "jsonwebtoken";  
 const client = new OpenAI({
     apiKey:process.env.Open_key
 });
@@ -27,6 +27,18 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 
+app.post("/auth2",async(req,res)=>{
+  const token = req.cookies.auth2;
+  
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if(!decode){
+      return res.json({message:"not logged in"})
+
+    }else{
+        return res.json({message:"Authentication success "})
+    }
+})
+
 app.post("/data",async(req,res)=>{
  const{email,password} = req.body.content;
 const find = await UserPass.findOne({email:email});
@@ -38,7 +50,7 @@ if(!find){
   const match = await bcrypt.compare(password, find.password);
   if(match){
     const token = jwt.sign(
-   {email,password} ,        
+   {email} ,        
   process.env.JWT_SECRET, 
   { expiresIn: "7d" }   
 );
