@@ -31,7 +31,7 @@ app.post("/auth2",async(req,res)=>{
   const token = req.cookies.auth2;
   
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if(!decode){
+    if(!decoded){
       return res.json({message:"not logged in"})
 
     }else{
