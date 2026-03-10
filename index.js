@@ -66,6 +66,7 @@ if(!find){
   res.cookie("auth2",token,{
  secure: true,  
 httpOnly:true,
+  path: "/",
   sameSite: "none",   
    maxAge: 7 * 24 * 60 * 60 * 1000
   })
