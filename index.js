@@ -27,17 +27,25 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 
-app.post("/auth2",async(req,res)=>{
-  const token = req.cookies.auth2;
-  
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if(!decoded){
-      return res.json({message:"not logged in"})
+app.post("/auth2", async (req, res) => {
 
-    }else{
-        return res.json({message:"Authentication success "})
+  try {
+
+    const token = req.cookies.auth2;
+
+    if (!token) {
+      return res.json({ message: "not logged in" });
     }
-})
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    return res.json({ message: "Authentication success" });
+
+  } catch (err) {
+    return res.json({ message: "not logged in" });
+  }
+
+});
 
 app.post("/data",async(req,res)=>{
  const{email,password} = req.body.content;
