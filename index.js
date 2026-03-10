@@ -22,6 +22,7 @@ app.use(cors({
   origin:"https://chatbot-frontend-orcin-ten.vercel.app",
   credentials: true,
 }));
+app.set("trust proxy", 1);
 app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
