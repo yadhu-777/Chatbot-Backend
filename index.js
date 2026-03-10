@@ -63,13 +63,13 @@ if(!find){
   { expiresIn: "7d" }   
 );
 
-  res.cookie("auth2",token,{
- secure: true,  
-httpOnly:true,
+  res.cookie("auth2", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
   path: "/",
-  sameSite: "none",   
-   maxAge: 7 * 24 * 60 * 60 * 1000
-  })
+  maxAge: 7 * 24 * 60 * 60 * 1000
+});
  return  res.json({message:"Authentication Success"});
 
   }else
