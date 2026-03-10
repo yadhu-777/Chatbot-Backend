@@ -36,14 +36,29 @@ if(!find){
 }
 
   const match = await bcrypt.compare(password, find.password);
-if(!match){
+  if(match){
+    const token = jwt.sign(
+   {email,password} ,        
+  process.env.JWT_SECRET, 
+  { expiresIn: "7d" }   
+);
+
+  res.cookie("auth2",token,{
+ secure: true,  
+httpOnly:true,
+  sameSite: "none",   
+   maxAge: 7 * 24 * 60 * 60 * 1000
+  })
+ return  res.json({message:"Authentication Success"});
+
+  }else
+    {
   return res.json({message:"Email or Password is wrong"})
   
 
-}else{
-   return  res.json({message:"Authentication Success"});
-
 }
+
+
  
 
  
