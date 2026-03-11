@@ -31,7 +31,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 
-app.post("addTeacher",async(req,res)=>{
+app.post("/addTeacher",async(req,res)=>{
   const{name,position,description} = req.body.content;
   try{
     const AddTeacher = new Teacher({
