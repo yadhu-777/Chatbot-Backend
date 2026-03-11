@@ -57,7 +57,9 @@ if(!find){
 }
 
   const match = await bcrypt.compare(password, find.password);
-  if(match){
+if(!match){
+   return res.json({message:"Email or Password is wrong"})
+}
     const token = jwt.sign(
    {email} ,        
   process.env.JWT_SECRET, 
@@ -73,12 +75,11 @@ if(!find){
 });
  return  res.json({message:"Authentication Success"});
 
-  }else
-    {
-  return res.json({message:"Email or Password is wrong"})
+
+ 
   
 
-}
+
 
 
  
