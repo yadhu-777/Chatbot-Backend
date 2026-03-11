@@ -23,7 +23,9 @@ app.use(cors({
 
   credentials: true,                          // MUST be true
   methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization"],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 
 app.use(cookieParser());
