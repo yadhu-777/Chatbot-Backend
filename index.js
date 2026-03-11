@@ -42,7 +42,7 @@ app.post("/addTeacher",async(req,res)=>{
   AddTeacher.save();
   res.json({message:"added Teacher"})
   }catch(err){
-    res.status(404).json({message:err});
+    res.status(401).json({message:err});
   }
 })
 
