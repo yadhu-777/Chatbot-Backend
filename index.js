@@ -14,22 +14,37 @@ const client = new OpenAI({
     apiKey:process.env.Open_key
 });
 import bcrypt  from "bcrypt";
-
+import Teacher from "./Schema/Teacher.js";
 import { OAuth2Client } from"google-auth-library";
 const Client = new OAuth2Client(process.env.CLIENT_ID);
 app.set("trust proxy", 1);
 app.use(cors({
   origin:"https://chatbot-frontend-orcin-ten.vercel.app",
   credentials: true,
-  // methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+
   preflightContinue: false,
-  // optionsSuccessStatus: 204
+
 }));
 
 app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+
+app.post("addTeacher",async(req,res)=>{
+  const{name,position,description} = req.body.content;
+  try{
+    const AddTeacher = new Teacher({
+    name:"name",
+    position:"position",
+    details:"description"
+  });
+  AddTeacher.save();
+  res.json({message:"added Teacher"})
+  }catch(err){
+    res.status(404).json({message:err});
+  }
+})
 
 app.post("/auth2", async (req, res) => {
 
