@@ -35,9 +35,9 @@ app.post("addTeacher",async(req,res)=>{
   const{name,position,description} = req.body.content;
   try{
     const AddTeacher = new Teacher({
-    name:"name",
-    position:"position",
-    details:"description"
+    name:name,
+    position:position,
+    details:description
   });
   AddTeacher.save();
   res.json({message:"added Teacher"})
