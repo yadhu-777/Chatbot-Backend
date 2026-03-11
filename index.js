@@ -22,7 +22,7 @@ app.use(cors({
   origin:"https://chatbot-frontend-orcin-ten.vercel.app",
   credentials: true,
   // methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  // preflightContinue: false,
+  preflightContinue: false,
   // optionsSuccessStatus: 204
 }));
 
