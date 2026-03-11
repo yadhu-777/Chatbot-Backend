@@ -20,7 +20,10 @@ const Client = new OAuth2Client(process.env.CLIENT_ID);
 app.set("trust proxy", 1);
 app.use(cors({
   origin:"https://chatbot-frontend-orcin-ten.vercel.app",
-  credentials: true,
+
+  credentials: true,                          // MUST be true
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use(cookieParser());
@@ -71,7 +74,8 @@ if(!match){
   secure: true,
   sameSite: "none",
   path: "/",
-  maxAge: 7 * 24 * 60 * 60 * 1000
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  partitioned: true
 });
  return  res.json({message:"Authentication Success"});
 
