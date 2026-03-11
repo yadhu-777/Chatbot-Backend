@@ -21,9 +21,9 @@ app.set("trust proxy", 1);
 app.use(cors({
   origin:"https://chatbot-frontend-orcin-ten.vercel.app",
   credentials: true,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  preflightContinue: false,
-  optionsSuccessStatus: 204
+  // methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  // preflightContinue: false,
+  // optionsSuccessStatus: 204
 }));
 
 app.use(cookieParser());
@@ -73,7 +73,7 @@ if(!find){
   sameSite: "none",
   path: "/",
   maxAge: 7 * 24 * 60 * 60 * 1000,
-  partitioned: true
+ 
 });
  return  res.json({message:"Authentication Success"});
 
