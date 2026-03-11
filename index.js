@@ -54,7 +54,7 @@ app.post("/auth2", async (req, res) => {
 });
 
 app.post("/data",async(req,res)=>{
- const{email,password} = req.body.content;
+ const{email,password} = req.body;
 const find = await UserPass.findOne({email:email});
 
 if(!find){
