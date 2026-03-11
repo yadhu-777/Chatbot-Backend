@@ -35,7 +35,7 @@ app.post("/auth2", async (req, res) => {
     const token = req.cookies.auth2;
 
     if (!token) {
-      return res.json({ message: "not logged in" });
+      return res.json({ message: "not logged in 1" });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -43,7 +43,7 @@ app.post("/auth2", async (req, res) => {
     return res.json({ message: "Authentication success" });
 
   } catch (err) {
-    return res.json({ message: "not logged in" });
+    return res.json({ message: "not logged in 2" });
   }
 
 });
