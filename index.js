@@ -40,7 +40,7 @@ app.post("/auth2", async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    return res.json({ message: "Authentication success" });
+    return res.json({ message: "Authentication success 1" });
 
   } catch (err) {
     return res.json({ message: "not logged in 2" });
