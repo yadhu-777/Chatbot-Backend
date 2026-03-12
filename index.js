@@ -31,6 +31,21 @@ app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+
+
+app.post("/getEvent",async(req,res)=>{
+ try{
+   const getEvent = await Event.find({});
+  if(!getEvent){
+     return res.json({message:"Error Ocurred"});
+  }
+  return res.json({message:getEvent});
+ }catch(err){
+   return res.json({message:err});
+ }
+})
+
+
 app.post("/addEvent",async(req,res)=>{
  try{
    const{name,date,details} = req.body.data;
