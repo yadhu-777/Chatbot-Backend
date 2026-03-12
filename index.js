@@ -17,6 +17,7 @@ import bcrypt  from "bcrypt";
 import Teacher from "./Schema/Teacher.js";
 import { OAuth2Client } from"google-auth-library";
 const Client = new OAuth2Client(process.env.CLIENT_ID);
+import Event from "./Schema/Event.js";
 app.set("trust proxy", 1);
 app.use(cors({
   origin:"https://chatbot-frontend-orcin-ten.vercel.app",
@@ -30,7 +31,10 @@ app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
-
+app.post("/addEvent",async(req,res)=>{
+  const{name,date,details} = req.body.data;
+  res.json({message:name})
+})
 
 app.post("/deleteTeacher",async(req,res)=>{
  try{
