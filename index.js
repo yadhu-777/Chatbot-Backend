@@ -32,7 +32,7 @@ app.use(express.urlencoded({extended:true}))
 
 
 
-app.post("/deleteTeacher",async(res,req)=>{
+app.post("/deleteTeacher",async(req,res)=>{
  try{
    const {id} = req.body;
   const del = await Teacher.deleteOne({_id:id});
