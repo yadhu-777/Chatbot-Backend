@@ -30,6 +30,13 @@ app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+app.post("/getTeacher",async(req,res)=>{
+const teacherDetails = await  Teacher.find({});
+if(!teacherDetails){
+  return res.json({message:"No Teacher Added"})
+}
+return res.json({message:teacherDetails})
+})
 
 app.post("/addTeacher",async(req,res)=>{
   const{name,position,description} = req.body.content;
