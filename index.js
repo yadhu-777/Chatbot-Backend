@@ -30,6 +30,21 @@ app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+
+
+app.delete("/deleteTeacher",async(res,req)=>{
+ try{
+   const {id} = req.body;
+  const del = await Teacher.deleteOne({_id:id});
+  return res.json({message:"deleted"});
+ }
+ catch(err){
+   return res.json({message:err.message});
+ }
+
+})
+
+
 app.post("/getTeacher",async(req,res)=>{
 const teacherDetails = await  Teacher.find({});
 if(!teacherDetails){
