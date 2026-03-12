@@ -32,6 +32,18 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 
+app.post("/deleteEvent",async(req,res)=>{
+ try{
+   const {id}  = req.body;
+  const delEvent = await Event.deleteOne({_id:id});
+  if(!delEvent){
+    return res.json({message:"Error While Deleting"})
+  }
+  res.json({message:"Deleted Successfullt"});
+ }catch(err){
+   res.json({message:err.message});
+ }
+})
 
 app.post("/getEvent",async(req,res)=>{
  try{
