@@ -36,6 +36,9 @@ app.post("/deleteTeacher",async(res,req)=>{
  try{
    const {id} = req.body;
   const del = await Teacher.deleteOne({_id:id});
+  if(!del){
+     return res.json({message:"not found"});
+  }
   return res.json({message:"deleted"});
  }
  catch(err){
