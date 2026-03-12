@@ -79,7 +79,7 @@ app.post("/addTeacher",async(req,res)=>{
     position:position,
     details:description
   });
-  AddTeacher.save();
+  await AddTeacher.save();
   res.json({message:"added Teacher"})
   }catch(err){
     res.status(401).json({message:err});
