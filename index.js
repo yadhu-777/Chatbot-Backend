@@ -32,8 +32,19 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 app.post("/addEvent",async(req,res)=>{
-  const{name,date,details} = req.body.data;
-  res.json({message:name})
+ try{
+   const{name,date,details} = req.body.data;
+ const addEvent = new Event({
+  name:name,
+  date:date,
+  details:details
+ });
+ await addEvent.save();
+ return res.json({message:"Event Added Successfully"})
+ }
+ catch(err){
+  return res.json({message:err});
+ }
 })
 
 app.post("/deleteTeacher",async(req,res)=>{
