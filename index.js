@@ -75,7 +75,7 @@ app.post("/addImage", upload.single("image"), async (req,res)=>{
     image:result.secure_url
   });
 
-  res.json({message:result.secure_url});
+  res.json({message:"image Added"});
 
  }
  catch(err){
