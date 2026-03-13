@@ -18,6 +18,9 @@ import Teacher from "./Schema/Teacher.js";
 import { OAuth2Client } from"google-auth-library";
 const Client = new OAuth2Client(process.env.CLIENT_ID);
 import Event from "./Schema/Event.js";
+import multer from "multer";
+
+const upload = multer({ dest: "uploads/" });
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
@@ -41,12 +44,12 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 
-app.post("/addImage", async (req,res)=>{
+app.post("/addImage", upload.single("image"), async (req,res)=>{
  try{
 
   const {name,description,image} = req.body;
 
-  const upload = await cloudinary.uploader.upload(image,{
+   const result = await cloudinary.uploader.upload(req.file.path,{
     folder:"college"
   });
 
