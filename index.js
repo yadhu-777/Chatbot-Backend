@@ -62,7 +62,7 @@ app.post("/addImage", upload.single("image"), async (req,res)=>{
   //   image:upload.secure_url
   // });
 
-  res.json({message:"Teacher Added"});
+  res.json({message:upload.secure_url});
 
  }
  catch(err){
