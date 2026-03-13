@@ -20,7 +20,9 @@ const Client = new OAuth2Client(process.env.CLIENT_ID);
 import Event from "./Schema/Event.js";
 import multer from "multer";
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: "uploads/",
+    limits: { fileSize: 5 * 1024 * 1024 }
+ });
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
