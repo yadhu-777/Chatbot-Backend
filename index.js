@@ -45,6 +45,18 @@ app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+app.post("/getHighlight",async(req,res)=>{
+  try{
+    const getHighlight = await highlight.find({});
+    if(!getHighlight){
+      return res.json({message:"Error during fetch"})
+    }
+    return res.json({message:getHighlight});
+  }catch(err){
+return res.json({message:err.message})
+  }
+})
+
 
 app.post("/addImage", upload.single("image"), async (req,res)=>{
  try{
