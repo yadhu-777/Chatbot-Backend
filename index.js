@@ -18,6 +18,15 @@ import Teacher from "./Schema/Teacher.js";
 import { OAuth2Client } from"google-auth-library";
 const Client = new OAuth2Client(process.env.CLIENT_ID);
 import Event from "./Schema/Event.js";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: "dke8pn6li",
+  api_key: "375113638191244",
+  api_secret: "a89V5YKQtwu9lpWtyZFKQVojEs8"
+});
+
+
 app.set("trust proxy", 1);
 app.use(cors({
   origin:"https://chatbot-frontend-orcin-ten.vercel.app",
@@ -30,6 +39,32 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
+
+
+app.post("/addImage", async (req,res)=>{
+ try{
+
+  const {name,description,image} = req.body;
+
+  const upload = await cloudinary.uploader.upload(image,{
+    folder:"college"
+  });
+
+  await Teacher.create({
+    name:name,
+   
+    details:description,
+    image:upload.secure_url
+  });
+
+  res.json({message:"Teacher Added"});
+
+ }
+ catch(err){
+  res.json({message:err.message});
+ }
+});
+
 
 
 app.post("/deleteEvent",async(req,res)=>{
