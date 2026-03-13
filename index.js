@@ -50,15 +50,15 @@ app.post("/addImage", upload.single("image"), async (req,res)=>{
   const {name,description,image} = req.body;
 
    const result = await cloudinary.uploader.upload(req.file.path,{
-    folder:"college"
+    folder:"home/college"
   });
 
-  await Teacher.create({
-    name:name,
+  // await Teacher.create({
+  //   name:name,
    
-    details:description,
-    image:upload.secure_url
-  });
+  //   details:description,
+  //   image:upload.secure_url
+  // });
 
   res.json({message:"Teacher Added"});
 
