@@ -49,17 +49,17 @@ app.use(express.urlencoded({extended:true}))
 app.post("/addImage", upload.single("image"), async (req,res)=>{
  try{
 
-  const {name,description} = req.body;
+  const {name} = req.body;
 
    const result = await cloudinary.uploader.upload(req.file.path,{
     folder:"college"
   });
-  
+
 
   await highlight.create({
     name:name,
    
-    details:description,
+   
     image:result.secure_url
   });
 
