@@ -45,6 +45,18 @@ app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+
+app.post("/highlightDelete",async(req,res)=>{
+ try{
+   const{id} = req.body;
+  const delHighlight = await highlight.deleteOne({_id:id});
+  return res.json({message:"Deleted"});
+ }catch(err){
+   return res.json({message:err.message});
+ }
+})
+
+
 app.post("/getHighlight",async(req,res)=>{
   try{
     const getHighlight = await highlight.find({});
