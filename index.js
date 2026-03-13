@@ -50,7 +50,7 @@ app.post("/addImage", upload.single("image"), async (req,res)=>{
   const {name,description,image} = req.body;
 
    const result = await cloudinary.uploader.upload(req.file.path,{
-    folder:"home/college"
+    folder:"college"
   });
 
   // await Teacher.create({
