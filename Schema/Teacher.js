@@ -12,7 +12,8 @@ const TeacherSchema = new mongoose.Schema({
     ,
     details:{
         type:String
-    }
+    },
+    image:String
 })
 
 const Teacher  = mongoose.model("Teacher",TeacherSchema);

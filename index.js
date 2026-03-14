@@ -165,11 +165,16 @@ return res.json({message:teacherDetails})
 
 app.post("/addTeacher",async(req,res)=>{
   const{name,position,description} = req.body.content;
+
   try{
+     const result = await cloudinary.uploader.upload(req.file.path,{
+    folder:"college"
+  });
     const AddTeacher = new Teacher({
     name:name,
     position:position,
-    details:description
+    details:description,
+    image:result.secure_url
   });
   await AddTeacher.save();
   res.json({message:"added Teacher"})
