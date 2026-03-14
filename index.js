@@ -167,7 +167,7 @@ if(!teacherDetails){
 return res.json({message:teacherDetails})
 })
 
-app.post("/addTeacher",async(req,res)=>{
+app.post("/addTeacher",upload.single("image"),async(req,res)=>{
   const{name,position,description} = req.body;
 
   try{
