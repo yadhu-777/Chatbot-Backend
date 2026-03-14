@@ -164,7 +164,7 @@ return res.json({message:teacherDetails})
 })
 
 app.post("/addTeacher",async(req,res)=>{
-  const{name,position,description} = req.body.content;
+  const{name,position,description} = req.body;
 
   try{
      const result = await cloudinary.uploader.upload(req.file.path,{
