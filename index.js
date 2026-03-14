@@ -33,8 +33,12 @@ cloudinary.config({
 
 
 app.set("trust proxy", 1);
+const origin = [
+  "http://localhost:5173",
+  "https://chatbot-frontend-orcin-ten.vercel.app"
+];
 app.use(cors({
-  origin:"https://chatbot-frontend-orcin-ten.vercel.app",
+ origin,
   credentials: true,
 
   preflightContinue: false,
