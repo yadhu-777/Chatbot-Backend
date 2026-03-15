@@ -276,7 +276,7 @@ app.post("/auth2", async (req, res) => {
 app.post("/data",async(req,res)=>{
  const{email,password} = req.body.content;
 const find = await UserPass.findOne({email:email});
-
+ res.clearCookie("auth2");
 if(!find){
  return  res.status(404).json({message:"Not Registered"})
 }
@@ -358,7 +358,7 @@ try {
 
 
 app.post("/vauth",async(req,res)=>{
-  
+   res.clearCookie("auth2");
   const {tknId} = req.body;
   const idToken = tknId;
   try{
