@@ -496,9 +496,9 @@ app.post("/config",async(req,res)=>{
    console.log("userId:",userId)
 let th = threadID;
 
-const response = await client.responses.create({
+const response = await client.chat.completions.create({
   model: "gpt-4o-mini",
-  input: inp,
+  messages: [{ role: "user", content: inp }],
 });
 
 
@@ -512,7 +512,7 @@ const UplUser = await userThrread.updateOne(
       "thread.$.messages": {
         $each: [
           { role: "User", message: inp },
-          { role: "Chatbot", message: response.output_text }
+          { role: "Chatbot", message: response.choices[0].message.content }
         ]
       }
     },
@@ -521,16 +521,16 @@ const UplUser = await userThrread.updateOne(
     }
     }
 )
-return res.json({message:response.output_text,thrId:th})
+return res.json({message:response.choices[0].message.content,thrId:th})
 
 }else{
   
 
   
-    const response2 = await client.responses.create({
+    const response2 = await client.chat.completions.create({
   model: "gpt-4o-mini",
-  input: `Generate a 3–5 word chat title summarizing this message.
-No quotes. No punctuation. ${inp}`,
+  messages: [{ role: "user", content: `Generate a 3–5 word chat title summarizing this message.
+No quotes. No punctuation. ${inp}` }],
 });
 
 
@@ -538,10 +538,10 @@ const UplUser = await userThrread.findOne({Email:userId});
 const threadId =  uuidv4();
 UplUser.thread.push({
   threadId,
-  title:response2.output_text,
+  title:response2.choices[0].message.content,
   messages: [
     { role: "User", message: inp },
-    { role: "Chatbot", message: response.output_text }
+    { role: "Chatbot", message: response.choices[0].message.content }
   ],
   UpdatedAt: new Date()
 });
