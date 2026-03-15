@@ -3,15 +3,15 @@ import nodemailer from "nodemailer";
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "yourgmail@gmail.com",
-    pass: "your-app-password",
+    user: "yadhuKris12121@gmail.com",
+    pass: "upns yigb fbnt svkv",
   },
 });
 
 export async function sendReminder(email, eventName) {
   try {
     await transporter.sendMail({
-      from: "yourgmail@gmail.com",
+      from: "yadhuKris12121@gmail.com",
       to: email,
       subject: "Event Reminder",
       text: `Reminder: ${eventName} is starting soon!`,
