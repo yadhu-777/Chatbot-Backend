@@ -50,6 +50,69 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 
+// app.post("/data",async(req,res)=>{
+//  const{uucms,password} = req.body.content;
+// const find = await UserPass.findOne({uucms:uucms});
+
+// if(!find){
+//  return  res.status(404).json({message:"Not Registered"})
+// }
+
+//   const match = await bcrypt.compare(password, find.password);
+//   if(match){
+//     const token = jwt.sign(
+//    {email} ,        
+//   process.env.JWT_SECRET, 
+//   { expiresIn: "7d" }   
+// );
+
+//   res.cookie("auth2", token, {
+//   httpOnly: true,
+//   secure: true,
+//   sameSite: "none",
+//   path: "/",
+//   maxAge: 7 * 24 * 60 * 60 * 1000,
+//   partitioned: true
+// });
+//  return  res.json({message:"Authentication Success"});
+
+//   }else
+//     {
+//   return res.json({message:"Email or Password is wrong"})
+  
+
+// }
+
+
+ 
+
+ 
+// })
+
+app.post("/checkAuth",(req,res)=>{
+
+ const token = req.cookies.auth2;
+
+ if(!token){
+  return res.json({logged:false});
+ }
+
+ try{
+
+ const decoded = jwt.verify(token,process.env.JWT_SECRET);
+
+ res.json({
+ 
+  role:decoded.role,
+  email:decoded.email
+ });
+
+ }catch(err){
+  res.json({logged:false});
+ }
+
+});
+
 app.post("/highlightDelete",async(req,res)=>{
  try{
    const{id} = req.body;
@@ -207,6 +270,9 @@ app.post("/auth2", async (req, res) => {
 
 });
 
+
+
+
 app.post("/data",async(req,res)=>{
  const{email,password} = req.body.content;
 const find = await UserPass.findOne({email:email});
@@ -218,7 +284,7 @@ if(!find){
   const match = await bcrypt.compare(password, find.password);
   if(match){
     const token = jwt.sign(
-   {email} ,        
+   {email,role:"admin"} ,        
   process.env.JWT_SECRET, 
   { expiresIn: "7d" }   
 );
@@ -308,12 +374,12 @@ const verify = await Client.verifyIdToken({
 const userFind = await userThrread.findOne({Email:email});
 if(userFind){
 const token = jwt.sign(
-   {email,name} ,        
+   {email,name,role:"student"} ,        
   process.env.JWT_SECRET, 
   { expiresIn: "7d" }   
 );
 
-  res.cookie("auth",token,{
+  res.cookie("auth2",token,{
  secure: true,  
 httpOnly:true,
   sameSite: "none",   
@@ -329,12 +395,12 @@ return res.send({mesage:"ok",name:name,email:email});
   await Threds.save();
   let ids = Threds.userId;
  const token = jwt.sign(
-  {email,name} ,        
+   {email,name,role:"student"} ,        
   process.env.JWT_SECRET, 
   { expiresIn: "7d" }   
 );
 
-  res.cookie("auth",token,{
+  res.cookie("auth2",token,{
   httpOnly: true,
   secure:true ,
   sameSite: "none",   
@@ -346,29 +412,29 @@ return res.send({mesage:"ok",name:name,email:email,thrid:Threds.userId})
   }
 
 })
-app.post("/verify",async(req,res)=>{
-  const cookie = req.cookies.auth;
+// app.post("/verify",async(req,res)=>{
+//   const cookie = req.cookies.auth;
   
-try{
- if(cookie){
-   const decoded = jwt.verify(
-    cookie,
-      process.env.JWT_SECRET
-  )
+// try{
+//  if(cookie){
+//    const decoded = jwt.verify(
+//     cookie,
+//       process.env.JWT_SECRET
+//   )
   
 
-  return  res.json({message:`hi ${decoded.name}`,content:decoded})
- }
+//   return  res.json({message:`hi ${decoded.name}`,content:decoded})
+//  }
 
- if(!cookie){
-return res.json({message:"loggin to your account"})
-  }
+//  if(!cookie){
+// return res.json({message:"loggin to your account"})
+//   }
  
   
-}catch(err){
-  return res.send({message:"verification error "})
-}
-})
+// }catch(err){
+//   return res.send({message:"verification error "})
+// }
+// })
 
 app.post("/fetchChat",async(req,res)=>{
   const {ThreadId,userId} = req.body;
