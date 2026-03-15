@@ -12,7 +12,8 @@ const EventSchema = new mongoose.Schema({
     ,
     details:{
         type:String
-    }
+    },
+    email:String
 })
 
 const Event  = mongoose.model("Event",EventSchema);

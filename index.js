@@ -13,6 +13,7 @@ import jwt, { decode } from "jsonwebtoken";
 const client = new OpenAI({
     apiKey:process.env.Open_key
 });
+import { sendReminder } from "./sendReminder.js";
 import bcrypt  from "bcrypt";
 import Teacher from "./Schema/Teacher.js";
 import { OAuth2Client } from"google-auth-library";
@@ -192,11 +193,12 @@ app.post("/getEvent",async(req,res)=>{
 
 app.post("/addEvent",async(req,res)=>{
  try{
-   const{name,date,details} = req.body.data;
+   const{name,date,details,email} = req.body.data;
  const addEvent = new Event({
   name:name,
   date:date,
-  details:details
+  details:details,
+  email:email
  });
  await addEvent.save();
  return res.json({message:"Event Added Successfully"})
@@ -490,149 +492,69 @@ console.log("err",err)
 })
 
 app.post("/config",async(req,res)=>{
+ const {inp,threadID,userId} = req.body;
+ console.log("inp:",inp)
+  console.log("threadID:",inp)
+   console.log("inp:",inp)
+let th = threadID;
 
-try{
-
-const {inp,threadID,userId} = req.body;
-
-if(!inp || !userId){
-return res.json({message:"Missing input"});
-}
-
-/* ========================
-AI RESPONSE
-======================== */
-
-const response = await client.chat.completions.create({
-
-model:"gpt-4o-mini",
-
-messages:[
-{role:"user",content:inp}
-]
-
-});
-
-const aiReply = response.choices[0].message.content;
-
-
-/* ========================
-IF THREAD EXISTS
-======================== */
-
-if(threadID){
-
-await userThrread.updateOne(
-
-{
-Email:userId,
-"thread.threadId":threadID
-},
-
-{
-$push:{
-"thread.$.messages":{
-$each:[
-{role:"User",message:inp},
-{role:"Chatbot",message:aiReply}
-]
-}
-},
-
-$set:{
-"thread.$.UpdatedAt":new Date()
-}
-
-}
-
-);
-
-return res.json({
-message:aiReply,
-thrId:threadID
-});
-
-}
-
-
-/* ========================
-CREATE NEW THREAD
-======================== */
-
-const threadId = uuidv4();
-
-/* generate chat title */
-
-const titleResponse = await client.chat.completions.create({
-
-model:"gpt-4o-mini",
-
-messages:[
-{
-role:"user",
-content:`Generate a short 3-5 word chat title. No punctuation. ${inp}`
-}
-]
-
-});
-
-const title = titleResponse.choices[0].message.content;
-
-
-/* find user */
-
-let user = await userThrread.findOne({Email:userId});
-
-if(!user){
-
-user = new userThrread({
-
-Email:userId,
-
-thread:[]
-
-});
-
-}
-
-
-/* push new thread */
-
-user.thread.push({
-
-threadId:threadId,
-
-title:title,
-
-messages:[
-{role:"User",message:inp},
-{role:"Chatbot",message:aiReply}
-],
-
-UpdatedAt:new Date()
-
-});
-
-await user.save();
-
-
-return res.json({
-
-message:aiReply,
-
-thrId:threadId
-
+const response = await client.responses.create({
+  model: "gpt-4o-mini",
+  input: inp,
 });
 
 
-}catch(err){
+if(threadID && userId){
 
-console.log(err);
+const UplUser = await userThrread.updateOne(
+{ Email:userId,
+   "thread.threadId":threadID},
+ 
+   { $push: {
+      "thread.$.messages": {
+        $each: [
+          { role: "User", message: inp },
+          { role: "Chatbot", message: response.output_text }
+        ]
+      }
+    },
+      $set: {
+      "thread.$.UpdatedAt": new Date()
+    }
+    }
+)
+return res.json({message:response.output_text,thrId:th})
 
-res.status(500).json({message:"Server Error"});
+}else{
+  
+
+  
+    const response2 = await client.responses.create({
+  model: "gpt-4o-mini",
+  input: `Generate a 3–5 word chat title summarizing this message.
+No quotes. No punctuation. ${inp}`,
+});
+
+
+const UplUser = await userThrread.findOne({Email:userId});
+const threadId =  uuidv4();
+UplUser.thread.push({
+  threadId,
+  title:response2.output_text,
+  messages: [
+    { role: "User", message: inp },
+    { role: "Chatbot", message: response.output_text }
+  ],
+  UpdatedAt: new Date()
+});
+
+await UplUser.save();
+
+
+
+return res.json({message:response.output_text,thrId:threadId})
 
 }
-
 
 })
 function connect(){
