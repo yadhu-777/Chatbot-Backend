@@ -274,7 +274,7 @@ app.post("/auth2", async (req, res) => {
 
 
 app.post("/data",async(req,res)=>{
-  res.clearCookie("auth2", {
+    res.clearCookie("auth2", {
   httpOnly: true,
   secure: true,
   sameSite: "none",
@@ -283,20 +283,13 @@ app.post("/data",async(req,res)=>{
 res.clearCookie("auth2", { path: "/admin" });
  const{email,password} = req.body.content;
 const find = await UserPass.findOne({email:email});
- res.clearCookie("auth2");
+
 if(!find){
  return  res.status(404).json({message:"Not Registered"})
 }
 
   const match = await bcrypt.compare(password, find.password);
   if(match){
-     res.cookie("auth2", "", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    path: "/",
-    expires: new Date(0)
-  });
     const token = jwt.sign(
    {email,role:"admin"} ,        
   process.env.JWT_SECRET, 
@@ -309,7 +302,7 @@ if(!find){
   sameSite: "none",
   path: "/",
   maxAge: 7 * 24 * 60 * 60 * 1000,
-
+  partitioned: true
 });
  return  res.json({message:"Authentication Success"});
 
@@ -379,8 +372,6 @@ app.post("/vauth",async(req,res)=>{
     path: "/",
     expires: new Date(0)
   });
-  
-  
   const {tknId} = req.body;
   const idToken = tknId;
   try{
@@ -500,49 +491,46 @@ console.log("err",err)
 
 app.post("/config",async(req,res)=>{
  const {inp,threadID,userId} = req.body;
-  console.log("Input:", inp);
- console.log("ThreadID:", threadID);
- console.log("UserId:", userId);
- 
+ console.log("inp:",inp)
+  console.log("threadID:",threadID)
+   console.log("userId:",userId)
 let th = threadID;
 
-const response = await client.chat.completions.create({
+const response = await client.responses.create({
   model: "gpt-4o-mini",
-  messages: [{ role: "user", content: inp }],
+  input: inp,
 });
 
 
-if (threadID && userId) {
+if(threadID && userId){
 
- const result = await userThrread.updateOne(
-   { Email: userId, "thread.threadId": threadID },
-   {
-     $push: {
-       "thread.$.messages": {
-         $each: [
-           { role: "User", message: inp },
-           { role: "Chatbot", message: response.output_text }
-         ]
-       }
-     },
-     $set: {
-       "thread.$.UpdatedAt": new Date()
-     }
-   }
- );
-
- console.log("Update result:", result);
-
- return res.json({ message: response.choices[0].message.content, thrId: threadID });
+const UplUser = await userThrread.updateOne(
+{ Email:userId,
+   "thread.threadId":threadID},
+ 
+   { $push: {
+      "thread.$.messages": {
+        $each: [
+          { role: "User", message: inp },
+          { role: "Chatbot", message: response.output_text }
+        ]
+      }
+    },
+      $set: {
+      "thread.$.UpdatedAt": new Date()
+    }
+    }
+)
+return res.json({message:response.output_text,thrId:th})
 
 }else{
   
 
   
-    const response2 = await client.chat.completions.create({
+    const response2 = await client.responses.create({
   model: "gpt-4o-mini",
-  messages: [{ role: "user", content: `Generate a 3–5 word chat title summarizing this message.
-No quotes. No punctuation. ${inp}` }],
+  input: `Generate a 3–5 word chat title summarizing this message.
+No quotes. No punctuation. ${inp}`,
 });
 
 
@@ -550,10 +538,10 @@ const UplUser = await userThrread.findOne({Email:userId});
 const threadId =  uuidv4();
 UplUser.thread.push({
   threadId,
-  title:response2.choices[0].message.content,
+  title:response2.output_text,
   messages: [
     { role: "User", message: inp },
-    { role: "Chatbot", message: response.choices[0].message.content }
+    { role: "Chatbot", message: response.output_text }
   ],
   UpdatedAt: new Date()
 });
@@ -562,7 +550,7 @@ await UplUser.save();
 
 
 
-return res.json({message:response.choices[0].message.content,thrId:threadId})
+return res.json({message:response.output_text,thrId:threadId})
 
 }
 
