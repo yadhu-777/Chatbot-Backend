@@ -1,11 +1,22 @@
 import nodemailer from "nodemailer";
 
+// const transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     user: "yadhuKris12121@gmail.com",
+//     pass: "upns yigb fbnt svkv",
+//   },
+// });
+// import nodemailer from "nodemailer";
+
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "yadhuKris12121@gmail.com",
+  port: 465,
+  secure: true,
   auth: {
     user: "yadhuKris12121@gmail.com",
-    pass: "upns yigb fbnt svkv",
-  },
+    pass: "upnsyigbfbntsvkv"
+  }
 });
 
 export async function sendReminder(email, eventName) {
