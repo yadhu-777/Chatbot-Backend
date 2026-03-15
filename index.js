@@ -274,6 +274,13 @@ app.post("/auth2", async (req, res) => {
 
 
 app.post("/data",async(req,res)=>{
+  res.clearCookie("auth2", {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  path: "/"
+});res.clearCookie("auth2", { path: "/" });
+res.clearCookie("auth2", { path: "/admin" });
  const{email,password} = req.body.content;
 const find = await UserPass.findOne({email:email});
  res.clearCookie("auth2");
@@ -283,6 +290,13 @@ if(!find){
 
   const match = await bcrypt.compare(password, find.password);
   if(match){
+     res.cookie("auth2", "", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    expires: new Date(0)
+  });
     const token = jwt.sign(
    {email,role:"admin"} ,        
   process.env.JWT_SECRET, 
@@ -295,7 +309,7 @@ if(!find){
   sameSite: "none",
   path: "/",
   maxAge: 7 * 24 * 60 * 60 * 1000,
-  partitioned: true
+
 });
  return  res.json({message:"Authentication Success"});
 
@@ -358,7 +372,12 @@ try {
 
 
 app.post("/vauth",async(req,res)=>{
-   res.clearCookie("auth2");
+    res.clearCookie("auth2", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/"
+  });
   const {tknId} = req.body;
   const idToken = tknId;
   try{
