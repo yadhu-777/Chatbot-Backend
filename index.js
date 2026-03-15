@@ -368,13 +368,13 @@ try {
 
 
 app.post("/vauth",async(req,res)=>{
-    res.cookie("auth2", "", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    path: "/",
-    expires: new Date(0)
-  });
+   res.clearCookie("auth2", {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  path: "/"
+});res.clearCookie("auth2", { path: "/" });
+res.clearCookie("auth2", { path: "/admin" });
   const {tknId} = req.body;
   const idToken = tknId;
   try{
