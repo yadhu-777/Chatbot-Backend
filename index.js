@@ -372,12 +372,15 @@ try {
 
 
 app.post("/vauth",async(req,res)=>{
-    res.clearCookie("auth2", {
+    res.cookie("auth2", "", {
     httpOnly: true,
     secure: true,
     sameSite: "none",
-    path: "/"
+    path: "/",
+    expires: new Date(0)
   });
+  
+  
   const {tknId} = req.body;
   const idToken = tknId;
   try{
