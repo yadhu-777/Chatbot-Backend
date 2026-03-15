@@ -89,7 +89,7 @@ app.use(express.urlencoded({extended:true}))
  
 // })
 
-app.post("/checkAuth",(req,res)=>{
+app.get("/checkAuth",(req,res)=>{
 
  const token = req.cookies.auth2;
 
