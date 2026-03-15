@@ -500,6 +500,9 @@ console.log("err",err)
 
 app.post("/config",async(req,res)=>{
  const {inp,threadID,userId} = req.body;
+  console.log("Input:", inp);
+ console.log("ThreadID:", threadID);
+ console.log("UserId:", userId);
  
 let th = threadID;
 
@@ -509,26 +512,28 @@ const response = await client.responses.create({
 });
 
 
-if(threadID && userId){
+if (threadID && userId) {
 
-const UplUser = await userThrread.updateOne(
-{ Email:userId,
-   "thread.threadId":threadID},
- 
-   { $push: {
-      "thread.$.messages": {
-        $each: [
-          { role: "User", message: inp },
-          { role: "Chatbot", message: response.output_text }
-        ]
-      }
-    },
-      $set: {
-      "thread.$.UpdatedAt": new Date()
-    }
-    }
-)
-return res.json({message:response.output_text,thrId:th})
+ const result = await userThrread.updateOne(
+   { Email: userId, "thread.threadId": threadID },
+   {
+     $push: {
+       "thread.$.messages": {
+         $each: [
+           { role: "User", message: inp },
+           { role: "Chatbot", message: response.output_text }
+         ]
+       }
+     },
+     $set: {
+       "thread.$.UpdatedAt": new Date()
+     }
+   }
+ );
+
+ console.log("Update result:", result);
+
+ return res.json({ message: response.output_text, thrId: threadID });
 
 }else{
   
