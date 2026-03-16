@@ -281,9 +281,10 @@ app.post("/data",async(req,res)=>{
   httpOnly: true,
   secure: true,
   sameSite: "none",
-  path: "/"
-});res.clearCookie("auth2", { path: "/" });
-res.clearCookie("auth2", { path: "/admin" });
+  path: "/",
+  partitioned: true
+});res.clearCookie("auth2", { path: "/", partitioned: true });
+res.clearCookie("auth2", { path: "/admin", partitioned: true });
  const{email,password} = req.body.content;
 const find = await UserPass.findOne({email:email});
 
@@ -372,9 +373,10 @@ app.post("/vauth",async(req,res)=>{
   httpOnly: true,
   secure: true,
   sameSite: "none",
-  path: "/"
-});res.clearCookie("auth2", { path: "/" });
-res.clearCookie("auth2", { path: "/admin" });
+  path: "/",
+  partitioned: true
+});res.clearCookie("auth2", { path: "/", partitioned: true });
+res.clearCookie("auth2", { path: "/admin", partitioned: true });
   const {tknId} = req.body;
   const idToken = tknId;
   try{
@@ -419,8 +421,10 @@ return res.send({mesage:"ok",name:name,email:email});
   res.cookie("auth2",token,{
   httpOnly: true,
   secure:true ,
-  sameSite: "none",   
-       maxAge: 7 * 24 * 60 * 60 * 1000
+  sameSite: "none",
+  path: "/",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  partitioned: true
   })
 return res.send({mesage:"ok",name:name,email:email,thrid:Threds.userId})
   }catch(err){
