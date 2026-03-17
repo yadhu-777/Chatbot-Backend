@@ -3,14 +3,14 @@ import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 587,          // ✅ use 587 instead of 465
-  secure: false,      // ✅ false for 587
+  port: 587,         
+  secure: false,     
   auth: {
     user: "yadhuKris12121@gmail.com",
     pass: "upnsyigbfbntsvkv",
   },
   tls: {
-    family: 4,        // 🔥 FORCE IPv4 (THIS FIXES YOUR ERROR)
+    family: 4,     
   },
 });
 // import nodemailer from "nodemailer";
