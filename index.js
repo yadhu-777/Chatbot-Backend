@@ -176,14 +176,17 @@ app.post("/getEvent", async (req, res) => {
   }
 });
 
-app.post("/addEvent", async (req, res) => {
+app.post("/addEvent", upload.single("image"), async (req, res) => {
   try {
+     const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "college",
+    });
     const { name, date, details, email } = req.body.data;
     const addEvent = new Event({
       name: name,
       date: date,
       details: details,
-      email: email,
+      image: result.secure_url,
     });
     await addEvent.save();
     return res.json({ message: "Event Added Successfully" });
