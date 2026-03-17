@@ -251,6 +251,9 @@ app.post("/auth2", async (req, res) => {
 
 app.post("/data", async (req, res) => {
   res.clearCookie("auth2", { path: "/" });
+   res.clearCookie("auth2", { path: "/admin" });
+      res.clearCookie("auth2", { path: "/home" });
+           res.clearCookie("auth2", { path: "/student" });
   const { email, password } = req.body.content;
   const find = await UserPass.findOne({ email: email });
 
@@ -317,6 +320,9 @@ app.post("/delThread", async (req, res) => {
 
 app.post("/vauth", async (req, res) => {
   res.clearCookie("auth2", { path: "/" });
+     res.clearCookie("auth2", { path: "/admin" });
+      res.clearCookie("auth2", { path: "/home" });
+           res.clearCookie("auth2", { path: "/student" });
   const { tknId } = req.body;
   const idToken = tknId;
   try {
