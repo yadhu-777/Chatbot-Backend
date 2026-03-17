@@ -181,7 +181,7 @@ app.post("/addEvent", upload.single("image"), async (req, res) => {
      const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "college",
     });
-    const { name, date, details, email } = req.body.data;
+    const { name, date, details } = req.body;
     const addEvent = new Event({
       name: name,
       date: date,
