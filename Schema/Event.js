@@ -13,7 +13,18 @@ const EventSchema = new mongoose.Schema({
     details:{
         type:String
     },
-    email:String
+   image:{
+    type:String
+   }
+   , reminder1DaySent: {
+    type: Boolean,
+    default: false,
+  },
+
+  reminder1HourSent: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const Event  = mongoose.model("Event",EventSchema);

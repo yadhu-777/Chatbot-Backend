@@ -14,7 +14,7 @@ const client = new OpenAI({
   apiKey: process.env.Open_key,
 });
 import "./eventReminder.js";
-import { sendReminder } from "./sendReminder.js";
+
 import bcrypt from "bcrypt";
 import Teacher from "./Schema/Teacher.js";
 import { OAuth2Client } from "google-auth-library";
