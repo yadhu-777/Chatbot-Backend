@@ -1,10 +1,16 @@
 import nodemailer from "nodemailer";
 
+
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,          // ✅ use 587 instead of 465
+  secure: false,      // ✅ false for 587
   auth: {
     user: "yadhuKris12121@gmail.com",
     pass: "upnsyigbfbntsvkv",
+  },
+  tls: {
+    family: 4,        // 🔥 FORCE IPv4 (THIS FIXES YOUR ERROR)
   },
 });
 // import nodemailer from "nodemailer";
