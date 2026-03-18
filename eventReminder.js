@@ -2,7 +2,7 @@ import cron from "node-cron";
 import Event from "./Schema/Event.js";
 import userThrread from "./Schema/User.js";
 import { sendReminder } from "./sendReminder.js";
-cron.schedule("*/20 * * * *", async () => {
+cron.schedule("* * * * *", async () => {
   console.log("Checking events every 20 minutes...");
 
   const events = await Event.find({});
