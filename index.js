@@ -30,9 +30,9 @@ const upload = multer({
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
-  cloud_name: "dke8pn6li",
-  api_key: "375113638191244",
-  api_secret: "a89V5YKQtwu9lpWtyZFKQVojEs8",
+  cloud_name: process.env.Cloud_nane,
+  api_key:process.env.api_key,
+  api_secret:process.env.api_secret,
 });
 
 app.set("trust proxy", 1);
