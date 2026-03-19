@@ -94,7 +94,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/news", async (req, res) => {
   try {
     const response = await fetch(
-      "https://news.google.com/rss/search?q=Bengaluru+North+University"
+      "https://news.google.com/rss/search?q=Bengaluru+North+University+OR+Bangalore+college+news&hl=en-IN&gl=IN&ceid=IN:en"
     );
     const text = await response.text();
 
