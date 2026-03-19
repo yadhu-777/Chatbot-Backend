@@ -91,6 +91,18 @@ app.use(express.urlencoded({ extended: true }));
 
 // })
 
+app.get("/news", async (req, res) => {
+  try {
+    const response = await fetch(
+      "https://news.google.com/rss/search?q=Bengaluru+North+University"
+    );
+    const text = await response.text();
+
+    res.send(text);
+  } catch (err) {
+    res.status(500).send("Error fetching news");
+  }
+});
 
 app.post("/complaint",async(req,res)=>{
 try{
