@@ -15,7 +15,7 @@ const client = new OpenAI({
 });
 import "./eventReminder.js";
 import { sendReminder } from "./sendReminder.js";
-
+import ComplaintModel from "./Schema/Complaint.js";
 import bcrypt from "bcrypt";
 import Teacher from "./Schema/Teacher.js";
 import { OAuth2Client } from "google-auth-library";
@@ -90,6 +90,21 @@ app.use(express.urlencoded({ extended: true }));
 // }
 
 // })
+
+
+app.post("/complaint",async(req,res)=>{
+try{
+    const{subject,description} = req.body.complaint;
+const saveComplaint = new ComplaintModel({
+subject:subject,
+description:description
+})
+await saveComplaint.save();
+return res.json({message:"Registered Succefully",subject:subject})
+}catch(err){
+  return res.json({message:err});
+}
+})
 
 app.get("/checkAuth", (req, res) => {
   const token = req.cookies.auth2;
