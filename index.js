@@ -237,7 +237,8 @@ app.post("/deleteTeacher", async (req, res) => {
 });
 
 app.post("/getTeacher", async (req, res) => {
-  const teacherDetails = await Teacher.find({});
+  const {course} = req.body;
+  const teacherDetails = await Teacher.find({department:course});
   if (!teacherDetails) {
     return res.json({ message: "No Teacher Added" });
   }
@@ -245,7 +246,7 @@ app.post("/getTeacher", async (req, res) => {
 });
 
 app.post("/addTeacher", upload.single("image"), async (req, res) => {
-  const { name, position, description } = req.body;
+  const { name, position, description,course } = req.body;
 
   try {
     const result = await cloudinary.uploader.upload(req.file.path, {
@@ -253,6 +254,7 @@ app.post("/addTeacher", upload.single("image"), async (req, res) => {
     });
     const AddTeacher = new Teacher({
       name: name,
+      department:course,
       position: position,
       details: description,
       image: result.secure_url,
