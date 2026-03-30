@@ -246,7 +246,7 @@ app.post("/getTeacher", async (req, res) => {
 });
 
 app.post("/addTeacher", upload.single("image"), async (req, res) => {
-  const { name, position, description,course } = req.body;
+  const { name, position, description,department } = req.body;
 
   try {
     const result = await cloudinary.uploader.upload(req.file.path, {
@@ -254,7 +254,7 @@ app.post("/addTeacher", upload.single("image"), async (req, res) => {
     });
     const AddTeacher = new Teacher({
       name: name,
-      department:course,
+      department:department,
       position: position,
       details: description,
       image: result.secure_url,
