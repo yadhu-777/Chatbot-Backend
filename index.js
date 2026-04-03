@@ -14,7 +14,6 @@ const client = new OpenAI({
   apiKey: process.env.Open_key,
 });
 import "./eventReminder.js";
-import { sendReminder } from "./sendReminder.js";
 import ComplaintModel from "./Schema/Complaint.js";
 import bcrypt from "bcrypt";
 import Teacher from "./Schema/Teacher.js";
@@ -234,6 +233,14 @@ app.post("/deleteTeacher", async (req, res) => {
   } catch (err) {
     return res.json({ message: err.message });
   }
+});
+app.post("/getTeacher1", async (req, res) => {
+  
+  const teacherDetails = await Teacher.find({});
+  if (!teacherDetails) {
+    return res.json({ message: "No Teacher Added" });
+  }
+  return res.json({ message: teacherDetails });
 });
 
 app.post("/getTeacher", async (req, res) => {

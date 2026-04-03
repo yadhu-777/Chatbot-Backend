@@ -10,19 +10,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  family: 4, // 🔥 FORCE IPv4
+  family: 4, 
 });
-// import nodemailer from "nodemailer";
 
-// const transporter = nodemailer.createTransport({
-//   host: "yadhuKris12121@gmail.com",
-//   port: 465,
-//   secure: true,
-//   auth: {
-//     user: "yadhuKris12121@gmail.com",
-//     pass: "upnsyigbfbntsvkv"
-//   }
-// });
 
 export async function sendReminder(email, eventName) {
   try {
