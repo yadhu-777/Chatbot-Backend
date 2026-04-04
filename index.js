@@ -90,6 +90,15 @@ app.use(express.urlencoded({ extended: true }));
 
 // })
 
+app.post("/classSpec", async (req, res) => {
+  try {
+    const {course} = req.body;
+    const data = await classModel.find({course:course});
+  res.json({data:data});
+  } catch (err) {
+    res.status(500).send("Error fetching news");
+  }
+});
 app.post("/addclass",upload.single("image"), async (req, res) => {
   const{name}= req.body;
   try {
@@ -109,7 +118,7 @@ url: result.secure_url,
 app.post("/class", async (req, res) => {
   try {
     const data = await classModel.find({});
-  res.json(data);
+  res.json({data:data});
   } catch (err) {
     res.status(500).send("Error fetching news");
   }
