@@ -93,6 +93,7 @@ app.use(express.urlencoded({ extended: true }));
 app.post("/classSpec", async (req, res) => {
   try {
     const {course} = req.body;
+    console.log(course);
     const data = await classModel.find({course:course});
   res.json({data:data});
   } catch (err) {
