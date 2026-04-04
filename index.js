@@ -96,7 +96,7 @@ app.post("/classSpec", async (req, res) => {
     const data = await classModel.find({course:course});
   res.json({data:data});
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send(err.message);
   }
 });
 app.post("/addclass",upload.single("image"), async (req, res) => {
