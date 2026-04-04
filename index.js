@@ -90,7 +90,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // })
 
-app.get("/addclass",upload.single("image"), async (req, res) => {
+app.post("/addclass",upload.single("image"), async (req, res) => {
   const{name}= req.body;
   try {
      const result = await cloudinary.uploader.upload(req.file.path, {
