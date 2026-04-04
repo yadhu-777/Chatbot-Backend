@@ -101,12 +101,12 @@ course:name,
 url: result.secure_url,
    })
     await add.save();
-     res.json({data:add, message: "image Added" });
+     res.json({message: "image Added" });
   } catch (err) {
     res.status(500).send("Error fetching news");
   }
 });
-app.get("/class", async (req, res) => {
+app.post("/class", async (req, res) => {
   try {
     const data = await classModel.find({});
   res.json(data);
