@@ -27,7 +27,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 import { v2 as cloudinary } from "cloudinary";
-
+import classModel from "./Schema/Class.js";
 cloudinary.config({
   cloud_name: process.env.Cloud_nane,
   api_key:process.env.api_key,
@@ -90,6 +90,30 @@ app.use(express.urlencoded({ extended: true }));
 
 // })
 
+app.get("/addclass",upload.single("image"), async (req, res) => {
+  const{name}= req.body;
+  try {
+     const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "college",
+    });
+   const add = new classModel({
+course:name,
+url: result.secure_url,
+   })
+    await add.save();
+     res.json({data:add, message: "image Added" });
+  } catch (err) {
+    res.status(500).send("Error fetching news");
+  }
+});
+app.get("/class", async (req, res) => {
+  try {
+    const data = await classModel.find({});
+  res.json(data);
+  } catch (err) {
+    res.status(500).send("Error fetching news");
+  }
+});
 app.get("/news", async (req, res) => {
   try {
     const response = await fetch(
