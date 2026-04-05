@@ -13,6 +13,7 @@ import jwt, { decode } from "jsonwebtoken";
 const client = new OpenAI({
   apiKey: process.env.Open_key,
 });
+import annModel from "./Schema/accouncement.js";
 import "./eventReminder.js";
 import ComplaintModel from "./Schema/Complaint.js";
 import bcrypt from "bcrypt";
@@ -102,7 +103,7 @@ app.get("/announcements", async (req, res) => {
 app.post("/pdf", upload.single("pdf"), async (req, res) => {
   const file = req.file;
 
-  const newAnn = new Ann({
+  const newAnn = new annModel({
     filename: file.filename,
     originalname: file.originalname,
     url: `/uploads/${file.filename}`
