@@ -55,7 +55,7 @@ app.use((req, res, next) => {
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use("/uploads", express.static("uploads"));
 // app.post("/data",async(req,res)=>{
 //  const{uucms,password} = req.body.content;
 // const find = await UserPass.findOne({uucms:uucms});
@@ -89,6 +89,29 @@ app.use(express.urlencoded({ extended: true }));
 // }
 
 // })
+
+app.get("/announcements", async (req, res) => {
+  try {
+    const data = await Ann.find().sort({ date: -1 });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/pdf", upload.single("pdf"), async (req, res) => {
+  const file = req.file;
+
+  const newAnn = new Ann({
+    filename: file.filename,
+    originalname: file.originalname,
+    url: `/uploads/${file.filename}`
+  });
+
+  await newAnn.save();
+
+  res.json({ message: "Saved in DB" });
+});
 
 app.post("/classSpec", async (req, res) => {
   try {
