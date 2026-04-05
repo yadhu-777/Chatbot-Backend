@@ -13,7 +13,9 @@ import jwt, { decode } from "jsonwebtoken";
 const client = new OpenAI({
   apiKey: process.env.Open_key,
 });
-import path from "path"
+import path from "path";
+import { fileURLToPath } from "url";
+
 import annModel from "./Schema/accouncement.js";
 import "./eventReminder.js";
 import ComplaintModel from "./Schema/Complaint.js";
@@ -55,15 +57,18 @@ app.use((req, res, next) => {
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static("uploads"));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, path.join(__dirname, "uploads")); // ✅ correct
   },
 
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // ✅ keeps .pdf
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
@@ -71,7 +76,6 @@ const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }
 });
-
 
 
 
@@ -86,7 +90,7 @@ app.get("/announcements", async (req, res) => {
 
 app.post("/pdf", upload.single("pdf"), async (req, res) => {
   try {
-    console.log(req.file); // 🔍 debug
+    console.log(req.file);
 
     const file = req.file;
 
