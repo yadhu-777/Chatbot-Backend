@@ -85,19 +85,30 @@ app.get("/announcements", async (req, res) => {
 });
 
 app.post("/pdf", upload.single("pdf"), async (req, res) => {
-  const file = req.file;
+  try {
+    console.log(req.file); // 🔍 debug
 
-  const newAnn = new annModel({
-    filename: file.filename,
-    originalname: file.originalname,
-    url: `/uploads/${file.filename}`
-  });
+    const file = req.file;
 
-  await newAnn.save();
+    if (!file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
 
-  res.json({ message: "Saved in DB" });
+    const newAnn = new annModel({
+      filename: file.filename,
+      originalname: file.originalname,
+      url: `/uploads/${file.filename}`
+    });
+
+    await newAnn.save();
+
+    res.json({ message: "Saved in DB" });
+
+  } catch (err) {
+    console.error("UPLOAD ERROR:", err); // 🔥 VERY IMPORTANT
+    res.status(500).json({ error: err.message });
+  }
 });
-
 app.post("/classSpec", async (req, res) => {
   try {
     const {course} = req.body;
