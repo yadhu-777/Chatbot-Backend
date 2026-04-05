@@ -44,16 +44,6 @@ const origin = [
 ];
 
 
-// ✅ Define __dirname FIRST
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-
-const uploadPath = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
-
 app.use(
   cors({
     origin,
@@ -72,23 +62,43 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.use("/uploads", express.static(uploadPath));
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "uploads")); // ✅ correct
-  },
 
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+const storage = new CloudinaryStorage({
+  cloudinary,
+params: {
+  folder: "announcements",
+  resource_type: "raw",
+  public_id: (req, file) => Date.now().toString(),
+}
+});
+
+const upload = multer({ storage });
+app.post("/pdf", upload.single("pdf"), async (req, res) => {
+  try {
+    const file = req.file;
+
+    if (!file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    console.log(file); // debug
+
+    const newAnn = new annModel({
+      filename: file.filename,
+      originalname: file.originalname,
+      url: file.path, // 🔥 Cloudinary URL
+    });
+
+    await newAnn.save();
+
+    res.json({ message: "Uploaded to Cloudinary ✅", url: file.path });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 });
-
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }
-});
-
 
 
 app.get("/announcements", async (req, res) => {
@@ -100,31 +110,7 @@ app.get("/announcements", async (req, res) => {
   }
 });
 
-app.post("/pdf", upload.single("pdf"), async (req, res) => {
-  try {
-    console.log(req.file);
 
-    const file = req.file;
-
-    if (!file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
-
-    const newAnn = new annModel({
-      filename: file.filename,
-      originalname: file.originalname,
-      url: `/uploads/${file.filename}`
-    });
-
-    await newAnn.save();
-
-    res.json({ message: "Saved in DB" });
-
-  } catch (err) {
-    console.error("UPLOAD ERROR:", err); // 🔥 VERY IMPORTANT
-    res.status(500).json({ error: err.message });
-  }
-});
 app.post("/classSpec", async (req, res) => {
   try {
     const {course} = req.body;
