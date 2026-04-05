@@ -93,7 +93,7 @@ app.use("/uploads", express.static("uploads"));
 
 app.get("/announcements", async (req, res) => {
   try {
-    const data = await Ann.find().sort({ date: -1 });
+    const data = await annModel.find().sort({ date: -1 });
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
