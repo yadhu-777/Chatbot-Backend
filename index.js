@@ -14,8 +14,7 @@ import jwt, { decode } from "jsonwebtoken";
 const client = new OpenAI({
   apiKey: process.env.Open_key,
 });
-import path from "path";
-import { fileURLToPath } from "url";
+
 
 import annModel from "./Schema/accouncement.js";
 import "./eventReminder.js";
