@@ -41,6 +41,18 @@ const origin = [
   "http://localhost:5173",
   "https://chatbot-frontend-orcin-ten.vercel.app",
 ];
+
+
+// ✅ Define __dirname FIRST
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ✅ Ensure uploads folder exists
+const uploadPath = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+}
+
 app.use(
   cors({
     origin,
@@ -57,10 +69,9 @@ app.use((req, res, next) => {
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+app.use("/uploads", express.static(uploadPath));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
