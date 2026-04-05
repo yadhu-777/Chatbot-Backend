@@ -13,6 +13,7 @@ import jwt, { decode } from "jsonwebtoken";
 const client = new OpenAI({
   apiKey: process.env.Open_key,
 });
+import path from "path"
 import annModel from "./Schema/accouncement.js";
 import "./eventReminder.js";
 import ComplaintModel from "./Schema/Complaint.js";
@@ -23,10 +24,7 @@ const Client = new OAuth2Client(process.env.CLIENT_ID);
 import Event from "./Schema/Event.js";
 import multer from "multer";
 import highlight from "./Schema/Highlight.js";
-const upload = multer({
-  dest: "uploads/",
-  limits: { fileSize: 5 * 1024 * 1024 },
-});
+
 import { v2 as cloudinary } from "cloudinary";
 import classModel from "./Schema/Class.js";
 cloudinary.config({
@@ -34,6 +32,7 @@ cloudinary.config({
   api_key:process.env.api_key,
   api_secret:process.env.api_secret,
 });
+
 
 app.set("trust proxy", 1);
 const origin = [
@@ -57,39 +56,24 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static("uploads"));
-// app.post("/data",async(req,res)=>{
-//  const{uucms,password} = req.body.content;
-// const find = await UserPass.findOne({uucms:uucms});
 
-// if(!find){
-//  return  res.status(404).json({message:"Not Registered"})
-// }
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
 
-//   const match = await bcrypt.compare(password, find.password);
-//   if(match){
-//     const token = jwt.sign(
-//    {email} ,
-//   process.env.JWT_SECRET,
-//   { expiresIn: "7d" }
-// );
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // ✅ keeps .pdf
+  }
+});
 
-//   res.cookie("auth2", token, {
-//   httpOnly: true,
-//   secure: true,
-//   sameSite: "none",
-//   path: "/",
-//   maxAge: 7 * 24 * 60 * 60 * 1000,
-//   partitioned: true
-// });
-//  return  res.json({message:"Authentication Success"});
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
 
-//   }else
-//     {
-//   return res.json({message:"Email or Password is wrong"})
 
-// }
 
-// })
 
 app.get("/announcements", async (req, res) => {
   try {
