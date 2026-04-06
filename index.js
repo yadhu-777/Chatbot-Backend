@@ -26,7 +26,7 @@ const Client = new OAuth2Client(process.env.CLIENT_ID);
 import Event from "./Schema/Event.js";
 import multer from "multer";
 import highlight from "./Schema/Highlight.js";
-
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { v2 as cloudinary } from "cloudinary";
 import classModel from "./Schema/Class.js";
 cloudinary.config({
