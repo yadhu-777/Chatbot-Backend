@@ -26,7 +26,7 @@ const Client = new OAuth2Client(process.env.CLIENT_ID);
 import Event from "./Schema/Event.js";
 import multer from "multer";
 import highlight from "./Schema/Highlight.js";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
+
 import { v2 as cloudinary } from "cloudinary";
 import classModel from "./Schema/Class.js";
 cloudinary.config({
@@ -63,42 +63,54 @@ app.use(express.urlencoded({ extended: true }));
 
 
 
-const storage = new CloudinaryStorage({
-  cloudinary,
-params: {
-  folder: "announcements",
-  resource_type: "raw",
-  public_id: (req, file) => Date.now().toString(),
-}
-});
-
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
+
+
 app.post("/pdf", upload.single("pdf"), async (req, res) => {
   try {
-    const file = req.file;
-
-    if (!file) {
+    if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    console.log(file); // debug
+    const streamUpload = () => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "announcements",
+            resource_type: "raw", // for PDF
+            public_id: Date.now().toString(),
+          },
+          (error, result) => {
+            if (result) resolve(result);
+            else reject(error);
+          }
+        );
+
+        stream.end(req.file.buffer);
+      });
+    };
+
+    const result = await streamUpload();
 
     const newAnn = new annModel({
-      filename: file.filename,
-      originalname: file.originalname,
-      url: file.path, // 🔥 Cloudinary URL
+      filename: result.public_id,
+      originalname: req.file.originalname,
+      url: result.secure_url, // ✅ correct URL
     });
 
     await newAnn.save();
 
-    res.json({ message: "Uploaded to Cloudinary ✅", url: file.path });
+    res.json({
+      message: "Uploaded to Cloudinary ✅",
+      url: result.secure_url,
+    });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
-
 
 app.get("/announcements", async (req, res) => {
   try {
