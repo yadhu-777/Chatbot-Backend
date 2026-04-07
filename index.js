@@ -413,24 +413,44 @@ app.post("/getTeacher", async (req, res) => {
   return res.json({ message: teacherDetails });
 });
 
+
 app.post("/addTeacher", upload.single("image"), async (req, res) => {
-  const { name, position, description,department } = req.body;
+  const { name, position, description, department } = req.body;
 
   try {
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "college",
-    });
+    if (!req.file) {
+      return res.json({ message: "No file uploaded" });
+    }
+
+    const streamUpload = () => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "college" },
+          (error, result) => {
+            if (result) resolve(result);
+            else reject(error);
+          }
+        );
+
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+    };
+
+    const result = await streamUpload();
+
     const AddTeacher = new Teacher({
-      name: name,
-      department:department,
-      position: position,
+      name,
+      department,
+      position,
       details: description,
       image: result.secure_url,
     });
+
     await AddTeacher.save();
-    res.json({ message: "added Teacher" });
+
+    res.json({ message: "Added Teacher Successfully" });
   } catch (err) {
-    res.status(401).json({ message: err });
+    res.status(500).json({ message: err.message });
   }
 });
 
