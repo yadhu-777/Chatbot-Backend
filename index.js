@@ -66,6 +66,40 @@ app.use(express.urlencoded({ extended: true }));
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+app.post("/addclass", upload.single("image"), async (req, res) => {
+  const { name } = req.body;
+
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const result = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        { folder: "college" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      ).end(req.file.buffer);
+    });
+
+    const add = new classModel({
+      course: name,
+      url: result.secure_url,
+    });
+
+    await add.save();
+
+    res.json({ message: "Image Added", data: add });
+
+  } catch (err) {
+    console.error(err); // 🔥 VERY IMPORTANT
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 app.delete("/pdf/:id", async (req, res) => {
   try {
     const deleted = await annModel.findByIdAndDelete(req.params.id);
@@ -147,22 +181,7 @@ app.post("/classSpec", async (req, res) => {
     res.status(500).send(err.message);
   }
 });
-app.post("/addclass",upload.single("image"), async (req, res) => {
-  const{name}= req.body;
-  try {
-     const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "college",
-    });
-   const add = new classModel({
-course:name,
-url: result.secure_url,
-   })
-    await add.save();
-     res.json({message: "image Added" });
-  } catch (err) {
-    res.status(500).send("Error fetching news");
-  }
-});
+
 app.post("/class", async (req, res) => {
   try {
     const data = await classModel.find({});
