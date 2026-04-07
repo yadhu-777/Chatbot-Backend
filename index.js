@@ -66,6 +66,21 @@ app.use(express.urlencoded({ extended: true }));
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+app.delete("/pdf/:id", async (req, res) => {
+  try {
+    const deleted = await annModel.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    res.json({ message: "Deleted from DB ✅" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.post("/pdf", upload.single("pdf"), async (req, res) => {
   try {
