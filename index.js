@@ -297,25 +297,25 @@ app.post("/getHighlight", async (req, res) => {
   }
 });
 
-app.post("/addImage", upload.single("image"), async (req, res) => {
-  try {
-    const { name } = req.body;
+// app.post("/addImage", upload.single("image"), async (req, res) => {
+//   try {
+//     const { name } = req.body;
 
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "college",
-    });
+//     const result = await cloudinary.uploader.upload(req.file.path, {
+//       folder: "college",
+//     });
 
-    await highlight.create({
-      name: name,
+//     await highlight.create({
+//       name: name,
 
-      image: result.secure_url,
-    });
+//       image: result.secure_url,
+//     });
 
-    res.json({ message: "image Added" });
-  } catch (err) {
-    res.json({ message: err.message });
-  }
-});
+//     res.json({ message: "image Added" });
+//   } catch (err) {
+//     res.json({ message: err.message });
+//   }
+// });
 
 app.post("/deleteEvent", async (req, res) => {
   try {
@@ -342,22 +342,44 @@ app.post("/getEvent", async (req, res) => {
   }
 });
 
+
+
 app.post("/addEvent", upload.single("image"), async (req, res) => {
   try {
-     const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "college",
-    });
     const { name, date, details } = req.body;
+
+    if (!req.file) {
+      return res.json({ message: "No file uploaded" });
+    }
+
+    const streamUpload = () => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "college" },
+          (error, result) => {
+            if (result) resolve(result);
+            else reject(error);
+          }
+        );
+
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+    };
+
+    const result = await streamUpload();
+
     const addEvent = new Event({
-      name: name,
-      date: date,
-      details: details,
+      name,
+      date,
+      details,
       image: result.secure_url,
     });
+
     await addEvent.save();
+
     return res.json({ message: "Event Added Successfully" });
   } catch (err) {
-    return res.json({ message: err });
+    return res.json({ message: err.message });
   }
 });
 
