@@ -15,7 +15,7 @@ const client = new OpenAI({
   apiKey: process.env.Open_key,
 });
 
-
+import streamifier from "streamifier";
 import annModel from "./Schema/accouncement.js";
 import "./eventReminder.js";
 import ComplaintModel from "./Schema/Complaint.js";
@@ -65,6 +65,45 @@ app.use(express.urlencoded({ extended: true }));
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
+
+
+
+app.post("/addImage", upload.single("image"), async (req, res) => {
+  try {
+    const { name } = req.body;
+
+    if (!req.file) {
+      return res.json({ message: "No file uploaded" });
+    }
+
+    const streamUpload = () => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "college" },
+          (error, result) => {
+            if (result) resolve(result);
+            else reject(error);
+          }
+        );
+
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+    };
+
+    const result = await streamUpload();
+
+    await highlight.create({
+      name: name,
+      image: result.secure_url,
+    });
+
+    res.json({ message: "Image Added Successfully" });
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+});
+
+
 
 app.post("/addclass", upload.single("image"), async (req, res) => {
   const { name } = req.body;
