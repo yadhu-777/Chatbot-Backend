@@ -31,19 +31,17 @@ import { v2 as cloudinary } from "cloudinary";
 import classModel from "./Schema/Class.js";
 cloudinary.config({
   cloud_name: process.env.Cloud_nane,
-  api_key:process.env.api_key,
-  api_secret:process.env.api_secret,
+  api_key: process.env.api_key,
+  api_secret: process.env.api_secret,
 });
 
 import nodemailer from "nodemailer";
-
 
 app.set("trust proxy", 1);
 const origin = [
   "http://localhost:5173",
   "https://chatbot-frontend-orcin-ten.vercel.app",
 ];
-
 
 app.use(
   cors({
@@ -54,7 +52,7 @@ app.use(
   }),
 );
 app.use((req, res, next) => {
- res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
   res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
   next();
 });
@@ -62,14 +60,48 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-
-
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-
-
+app.get("/admin/users-analytics", async (req, res) => {
+  try {
+    const users = await UserthreadModel.find({});
+ 
+    // Total users
+    const totalUsers = users.length;
+ 
+    // Total threads across all users
+    const totalThreads = users.reduce((sum, u) => sum + (u.thread?.length || 0), 0);
+ 
+    // Per-user data for table + bar chart
+    const userData = users.map((u) => ({
+      email: u.Email,
+      userId: u.userId,
+      threadCount: u.thread?.length || 0,
+    }));
+ 
+    // Group users joined by month using _id (ObjectId contains timestamp)
+    const monthMap = {};
+    users.forEach((u) => {
+      const date = u._id.getTimestamp();           // extract date from ObjectId
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      monthMap[key] = (monthMap[key] || 0) + 1;
+    });
+ 
+    const joinedByMonth = Object.entries(monthMap)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([month, count]) => ({ month, count }));
+ 
+    return res.json({
+      totalUsers,
+      totalThreads,
+      userData,
+      joinedByMonth,
+    });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+});
 app.post("/pdf2", upload.single("pdf"), async (req, res) => {
   try {
     if (!req.file) {
@@ -87,7 +119,7 @@ app.post("/pdf2", upload.single("pdf"), async (req, res) => {
           (error, result) => {
             if (result) resolve(result);
             else reject(error);
-          }
+          },
         );
 
         stream.end(req.file.buffer);
@@ -108,14 +140,11 @@ app.post("/pdf2", upload.single("pdf"), async (req, res) => {
       message: "Uploaded to Cloudinary ✅",
       url: result.secure_url,
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
-
-
 
 app.post("/addImage", upload.single("image"), async (req, res) => {
   try {
@@ -132,7 +161,7 @@ app.post("/addImage", upload.single("image"), async (req, res) => {
           (error, result) => {
             if (result) resolve(result);
             else reject(error);
-          }
+          },
         );
 
         streamifier.createReadStream(req.file.buffer).pipe(stream);
@@ -152,8 +181,6 @@ app.post("/addImage", upload.single("image"), async (req, res) => {
   }
 });
 
-
-
 app.post("/addclass", upload.single("image"), async (req, res) => {
   const { name } = req.body;
 
@@ -163,13 +190,12 @@ app.post("/addclass", upload.single("image"), async (req, res) => {
     }
 
     const result = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        { folder: "college" },
-        (error, result) => {
+      cloudinary.uploader
+        .upload_stream({ folder: "college" }, (error, result) => {
           if (error) reject(error);
           else resolve(result);
-        }
-      ).end(req.file.buffer);
+        })
+        .end(req.file.buffer);
     });
 
     const add = new classModel({
@@ -180,13 +206,11 @@ app.post("/addclass", upload.single("image"), async (req, res) => {
     await add.save();
 
     res.json({ message: "Image Added", data: add });
-
   } catch (err) {
     console.error(err); // 🔥 VERY IMPORTANT
     res.status(500).json({ error: err.message });
   }
 });
-
 
 app.delete("/pdf/:id", async (req, res) => {
   try {
@@ -197,7 +221,6 @@ app.delete("/pdf/:id", async (req, res) => {
     }
 
     res.json({ message: "Deleted from DB ✅" });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
@@ -221,7 +244,7 @@ app.post("/pdf", upload.single("pdf"), async (req, res) => {
           (error, result) => {
             if (result) resolve(result);
             else reject(error);
-          }
+          },
         );
 
         stream.end(req.file.buffer);
@@ -242,7 +265,6 @@ app.post("/pdf", upload.single("pdf"), async (req, res) => {
       message: "Uploaded to Cloudinary ✅",
       url: result.secure_url,
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
@@ -258,13 +280,12 @@ app.get("/announcements", async (req, res) => {
   }
 });
 
-
 app.post("/classSpec", async (req, res) => {
   try {
-    const {course} = req.body;
+    const { course } = req.body;
     console.log(course);
-    const data = await classModel.find({course:course});
-  res.json({data:data});
+    const data = await classModel.find({ course: course });
+    res.json({ data: data });
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -273,7 +294,7 @@ app.post("/classSpec", async (req, res) => {
 app.post("/class", async (req, res) => {
   try {
     const data = await classModel.find({});
-  res.json({data:data});
+    res.json({ data: data });
   } catch (err) {
     res.status(500).send("Error fetching news");
   }
@@ -281,7 +302,7 @@ app.post("/class", async (req, res) => {
 app.get("/news", async (req, res) => {
   try {
     const response = await fetch(
-      "https://news.google.com/rss/search?q=Bengaluru+North+University+OR+Bangalore+college+latest+news&hl=en-IN&gl=IN&ceid=IN:en"
+      "https://news.google.com/rss/search?q=Bengaluru+North+University+OR+Bangalore+college+latest+news&hl=en-IN&gl=IN&ceid=IN:en",
     );
     const text = await response.text();
 
@@ -307,7 +328,7 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
           (error, result) => {
             if (result) resolve(result);
             else reject(error);
-          }
+          },
         );
         streamifier.createReadStream(req.file.buffer).pipe(stream);
       });
@@ -322,21 +343,21 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
       image: result.secure_url,
     });
     await saveComplaint.save();
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  family: 4, 
-});
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      family: 4,
+    });
 
     // 3. Send email with image attachment
     await transporter.sendMail({
       from: `"Complaint System" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER,           // receives at same email, change if needed
+      to: process.env.EMAIL_USER, // receives at same email, change if needed
       subject: `New Complaint: ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -373,13 +394,12 @@ const transporter = nodemailer.createTransport({
       attachments: [
         {
           filename: req.file.originalname || "complaint-image.jpg",
-          path: result.secure_url,        // nodemailer fetches from Cloudinary URL
+          path: result.secure_url, // nodemailer fetches from Cloudinary URL
         },
       ],
     });
 
     return res.json({ message: "Registered Successfully", subject: subject });
-
   } catch (err) {
     return res.json({ message: err.message || err });
   }
@@ -471,8 +491,6 @@ app.post("/getEvent", async (req, res) => {
   }
 });
 
-
-
 app.post("/addEvent", upload.single("image"), async (req, res) => {
   try {
     const { name, date, details } = req.body;
@@ -488,7 +506,7 @@ app.post("/addEvent", upload.single("image"), async (req, res) => {
           (error, result) => {
             if (result) resolve(result);
             else reject(error);
-          }
+          },
         );
 
         streamifier.createReadStream(req.file.buffer).pipe(stream);
@@ -525,7 +543,6 @@ app.post("/deleteTeacher", async (req, res) => {
   }
 });
 app.post("/getTeacher1", async (req, res) => {
-  
   const teacherDetails = await Teacher.find({});
   if (!teacherDetails) {
     return res.json({ message: "No Teacher Added" });
@@ -534,14 +551,13 @@ app.post("/getTeacher1", async (req, res) => {
 });
 
 app.post("/getTeacher", async (req, res) => {
-  const {course} = req.body;
-  const teacherDetails = await Teacher.find({department:course});
+  const { course } = req.body;
+  const teacherDetails = await Teacher.find({ department: course });
   if (!teacherDetails) {
     return res.json({ message: "No Teacher Added" });
   }
   return res.json({ message: teacherDetails });
 });
-
 
 app.post("/addTeacher", upload.single("image"), async (req, res) => {
   const { name, position, description, department } = req.body;
@@ -558,7 +574,7 @@ app.post("/addTeacher", upload.single("image"), async (req, res) => {
           (error, result) => {
             if (result) resolve(result);
             else reject(error);
-          }
+          },
         );
 
         streamifier.createReadStream(req.file.buffer).pipe(stream);
@@ -601,9 +617,9 @@ app.post("/auth2", async (req, res) => {
 
 app.post("/data", async (req, res) => {
   res.clearCookie("auth2", { path: "/" });
-   res.clearCookie("auth2", { path: "/admin" });
-      res.clearCookie("auth2", { path: "/home" });
-           res.clearCookie("auth2", { path: "/student" });
+  res.clearCookie("auth2", { path: "/admin" });
+  res.clearCookie("auth2", { path: "/home" });
+  res.clearCookie("auth2", { path: "/student" });
   const { email, password } = req.body.content;
   const find = await UserPass.findOne({ email: email });
 
@@ -670,9 +686,9 @@ app.post("/delThread", async (req, res) => {
 
 app.post("/vauth", async (req, res) => {
   res.clearCookie("auth2", { path: "/" });
-     res.clearCookie("auth2", { path: "/admin" });
-      res.clearCookie("auth2", { path: "/home" });
-           res.clearCookie("auth2", { path: "/student" });
+  res.clearCookie("auth2", { path: "/admin" });
+  res.clearCookie("auth2", { path: "/home" });
+  res.clearCookie("auth2", { path: "/student" });
   const { tknId } = req.body;
   const idToken = tknId;
   try {
