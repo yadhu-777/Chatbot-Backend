@@ -65,7 +65,7 @@ const upload = multer({ storage });
 
 app.get("/admin/users-analytics", async (req, res) => {
   try {
-    const users = await UserthreadModel.find({});
+    const users = await userThrread.find({});
  
     // Total users
     const totalUsers = users.length;
