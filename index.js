@@ -145,7 +145,14 @@ app.post("/pdf2", upload.single("pdf"), async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
+app.get("/syllabus", async (req, res) => {
+  try {
+    const data = await syllabusModel.find().sort({ date: -1 });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 app.post("/addImage", upload.single("image"), async (req, res) => {
   try {
     const { name } = req.body;
