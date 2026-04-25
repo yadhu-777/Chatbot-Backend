@@ -153,6 +153,20 @@ app.get("/syllabus", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+app.delete("/pdf2/:id", async (req, res) => {
+  try {
+    const deleted = await syllabusModel.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    res.json({ message: "Deleted from DB ✅" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
 app.post("/addImage", upload.single("image"), async (req, res) => {
   try {
     const { name } = req.body;
