@@ -63,6 +63,76 @@ app.use(express.urlencoded({ extended: true }));
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+app.post("/complaint", upload.single("image"), async (req, res) => {
+  try {
+    const { subject, description } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    if (!subject || !description) {
+      return res.status(400).json({ message: "Subject and description are required" });
+    }
+
+    // 1. Upload image to Cloudinary
+    const streamUpload = () => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "college" },
+          (error, result) => {
+            if (result) resolve(result);
+            else reject(error);
+          },
+        );
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+    };
+
+    const result = await streamUpload();
+
+    // 2. Save complaint to DB
+    const saveComplaint = new ComplaintModel({
+      subject: subject,
+      description: description,
+      image: result.secure_url,
+    });
+    await saveComplaint.save();
+
+  const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+try {
+  const info = await transporter.sendMail({
+    from: `"Complaint System" <${process.env.EMAIL_USER}>`,
+    to: process.env.EMAIL_USER,
+    subject: `New Complaint: ${subject}`,
+    html: `
+      <h2>New Complaint</h2>
+      <p><b>Subject:</b> ${subject}</p>
+      <p><b>Description:</b> ${description}</p>
+      <img src="${result.secure_url}" width="300"/>
+    `,
+  });
+
+  console.log("✅ Email sent:", info.response);
+
+} catch (error) {
+  console.error("❌ Email failed:", error);
+}
+
+    return res.status(200).json({ message: "Registered Successfully", subject: subject });
+  } catch (err) {
+    return res.status(500).json({ message: err.message || "Something went wrong" });
+  }
+});
+
+
 app.get("/admin/users-analytics", async (req, res) => {
   try {
     const users = await userThrread.find({});
@@ -333,103 +403,7 @@ app.get("/news", async (req, res) => {
   }
 });
 
-app.post("/complaint", upload.single("image"), async (req, res) => {
-  try {
-    const { subject, description } = req.body;
 
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
-
-    if (!subject || !description) {
-      return res.status(400).json({ message: "Subject and description are required" });
-    }
-
-    // 1. Upload image to Cloudinary
-    const streamUpload = () => {
-      return new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: "college" },
-          (error, result) => {
-            if (result) resolve(result);
-            else reject(error);
-          },
-        );
-        streamifier.createReadStream(req.file.buffer).pipe(stream);
-      });
-    };
-
-    const result = await streamUpload();
-
-    // 2. Save complaint to DB
-    const saveComplaint = new ComplaintModel({
-      subject: subject,
-      description: description,
-      image: result.secure_url,
-    });
-    await saveComplaint.save();
-
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-      family: 4,
-    });
-
-    // 3. Send email with image attachment
-    await transporter.sendMail({
-      from: `"Complaint System" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER,
-      subject: `New Complaint: ${subject}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #0d1b2e; border-bottom: 2px solid #b8963e; padding-bottom: 10px;">
-            New Complaint Registered
-          </h2>
-          <table style="width:100%; border-collapse: collapse; margin-top: 20px;">
-            <tr>
-              <td style="padding: 10px; font-weight: bold; color: #555; width: 130px;">Subject:</td>
-              <td style="padding: 10px; color: #222;">${subject}</td>
-            </tr>
-            <tr style="background: #f9f9f9;">
-              <td style="padding: 10px; font-weight: bold; color: #555;">Description:</td>
-              <td style="padding: 10px; color: #222;">${description}</td>
-            </tr>
-            <tr>
-              <td style="padding: 10px; font-weight: bold; color: #555;">Submitted At:</td>
-              <td style="padding: 10px; color: #222;">${new Date().toLocaleString()}</td>
-            </tr>
-          </table>
-          <div style="margin-top: 24px;">
-            <p style="font-weight: bold; color: #555; margin-bottom: 8px;">Attached Image:</p>
-            <img 
-              src="${result.secure_url}" 
-              alt="Complaint Image"
-              style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px;"
-            />
-          </div>
-          <p style="margin-top: 24px; font-size: 12px; color: #999;">
-            This is an automated email from the Complaint Management System.
-          </p>
-        </div>
-      `,
-      attachments: [
-        {
-          filename: req.file.originalname || "complaint-image.jpg",
-          path: result.secure_url,
-        },
-      ],
-    });
-
-    return res.status(200).json({ message: "Registered Successfully", subject: subject });
-  } catch (err) {
-    return res.status(500).json({ message: err.message || "Something went wrong" });
-  }
-});
 app.get("/checkAuth", (req, res) => {
   const token = req.cookies.auth2;
 
