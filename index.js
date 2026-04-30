@@ -338,7 +338,11 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
     const { subject, description } = req.body;
 
     if (!req.file) {
-      return res.json({ message: "No file uploaded" });
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    if (!subject || !description) {
+      return res.status(400).json({ message: "Subject and description are required" });
     }
 
     // 1. Upload image to Cloudinary
@@ -364,6 +368,7 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
       image: result.secure_url,
     });
     await saveComplaint.save();
+
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
@@ -378,7 +383,7 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
     // 3. Send email with image attachment
     await transporter.sendMail({
       from: `"Complaint System" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER, // receives at same email, change if needed
+      to: process.env.EMAIL_USER,
       subject: `New Complaint: ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -415,17 +420,16 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
       attachments: [
         {
           filename: req.file.originalname || "complaint-image.jpg",
-          path: result.secure_url, // nodemailer fetches from Cloudinary URL
+          path: result.secure_url,
         },
       ],
     });
 
-    return res.json({ message: "Registered Successfully", subject: subject });
+    return res.status(200).json({ message: "Registered Successfully", subject: subject });
   } catch (err) {
-    return res.json({ message: err.message || err });
+    return res.status(500).json({ message: err.message || "Something went wrong" });
   }
 });
-
 app.get("/checkAuth", (req, res) => {
   const token = req.cookies.auth2;
 
