@@ -36,7 +36,9 @@ cloudinary.config({
 });
 
 import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
+const resend = new Resend(process.env.RESEND_API_KEY);
 app.set("trust proxy", 1);
 const origin = [
   "http://localhost:5173",
@@ -390,10 +392,10 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
 
     await newComplaint.save();
 
-    // ✅ 3. Send email in background (NO await)
-    transporter
-      .sendMail({
-        from: `"Complaint System" <${process.env.EMAIL_USER}>`,
+    // ✅ 3. Send email in background (Resend)
+    resend.emails
+      .send({
+        from: process.env.EMAIL_USER   , // 🔥 use this for testing
         to: process.env.EMAIL_USER,
         subject: `New Complaint: ${subject}`,
         html: `
@@ -414,15 +416,9 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
             </p>
           </div>
         `,
-        attachments: [
-          {
-            filename: req.file.originalname || "complaint-image.jpg",
-            path: result.secure_url,
-          },
-        ],
       })
       .catch((err) => {
-        console.error("Email failed:", err.message);
+        console.error("Email failed:", err);
       });
 
     // ✅ 4. Send response ONLY ONCE
