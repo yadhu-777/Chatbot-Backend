@@ -332,6 +332,13 @@ app.get("/news", async (req, res) => {
     res.status(500).send("Error fetching news");
   }
 });
+transporter.verify((error, success) => {
+  if (error) {
+    console.log("Error:", error);
+  } else {
+    console.log("Server is ready to send mail");
+  }
+});
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
