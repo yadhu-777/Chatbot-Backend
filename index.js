@@ -332,7 +332,16 @@ app.get("/news", async (req, res) => {
     res.status(500).send("Error fetching news");
   }
 });
-
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+  family: 4,
+});
 app.post("/complaint", upload.single("image"), async (req, res) => {
   try {
     const { subject, description } = req.body;
@@ -369,19 +378,10 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
     await saveComplaint.save();
 
     // ✅ 3. Respond IMMEDIATELY — don't wait for email
-    res.status(200).json({ message: "Registered Successfully", subject });
+  
 
     // 4. Send email IN BACKGROUND (fire and forget)
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-      family: 4,
-    });
+   
 
     transporter.sendMail({
       from: `"Complaint System" <${process.env.EMAIL_USER}>`,
@@ -422,7 +422,9 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
           path: result.secure_url,
         },
       ],
-    }).catch(err => {
+      
+    }
+  ,  res.status(200).json({ message: "Registered Successfully", subject })).catch(err => {
       // Log silently — don't crash since response already sent
       console.error("Email failed (background):", err.message);
     });
