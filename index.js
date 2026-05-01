@@ -334,11 +334,14 @@ app.get("/news", async (req, res) => {
 });
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // ✅ use TLS
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    pass: process.env.EMAIL_PASS, // ✅ app password
   },
+  family: 4, // ✅ FORCE IPv4 (fixes ENETUNREACH)
 });
 transporter.verify((error, success) => {
   if (error) {
@@ -351,14 +354,18 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
   try {
     const { subject, description } = req.body;
 
+    // ✅ Validation
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
+
     if (!subject || !description) {
-      return res.status(400).json({ message: "Subject and description are required" });
+      return res.status(400).json({
+        message: "Subject and description are required",
+      });
     }
 
-    // 1. Upload image to Cloudinary
+    // ✅ 1. Upload image to Cloudinary
     const streamUpload = () => {
       return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
@@ -374,68 +381,61 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
 
     const result = await streamUpload();
 
-    // 2. Save complaint to DB
-    const saveComplaint = new ComplaintModel({
+    // ✅ 2. Save to DB
+    const newComplaint = new ComplaintModel({
       subject,
       description,
       image: result.secure_url,
     });
-    await saveComplaint.save();
 
-    // ✅ 3. Respond IMMEDIATELY — don't wait for email
-  
+    await newComplaint.save();
 
-    // 4. Send email IN BACKGROUND (fire and forget)
-   
+    // ✅ 3. Send email in background (NO await)
+    transporter
+      .sendMail({
+        from: `"Complaint System" <${process.env.EMAIL_USER}>`,
+        to: process.env.EMAIL_USER,
+        subject: `New Complaint: ${subject}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+            <h2 style="color: #0d1b2e;">New Complaint Registered</h2>
 
-    transporter.sendMail({
-      from: `"Complaint System" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER,
-      subject: `New Complaint: ${subject}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #0d1b2e; border-bottom: 2px solid #b8963e; padding-bottom: 10px;">
-            New Complaint Registered
-          </h2>
-          <table style="width:100%; border-collapse: collapse; margin-top: 20px;">
-            <tr>
-              <td style="padding: 10px; font-weight: bold; color: #555; width: 130px;">Subject:</td>
-              <td style="padding: 10px; color: #222;">${subject}</td>
-            </tr>
-            <tr style="background: #f9f9f9;">
-              <td style="padding: 10px; font-weight: bold; color: #555;">Description:</td>
-              <td style="padding: 10px; color: #222;">${description}</td>
-            </tr>
-            <tr>
-              <td style="padding: 10px; font-weight: bold; color: #555;">Submitted At:</td>
-              <td style="padding: 10px; color: #222;">${new Date().toLocaleString()}</td>
-            </tr>
-          </table>
-          <div style="margin-top: 24px;">
-            <p style="font-weight: bold; color: #555; margin-bottom: 8px;">Attached Image:</p>
-            <img src="${result.secure_url}" alt="Complaint Image"
-              style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px;" />
+            <p><strong>Subject:</strong> ${subject}</p>
+            <p><strong>Description:</strong> ${description}</p>
+            <p><strong>Submitted At:</strong> ${new Date().toLocaleString()}</p>
+
+            <div style="margin-top: 20px;">
+              <p><strong>Image:</strong></p>
+              <img src="${result.secure_url}" style="max-width: 100%;" />
+            </div>
+
+            <p style="margin-top: 20px; font-size: 12px; color: gray;">
+              Auto-generated email
+            </p>
           </div>
-          <p style="margin-top: 24px; font-size: 12px; color: #999;">
-            This is an automated email from the Complaint Management System.
-          </p>
-        </div>
-      `,
-      attachments: [
-        {
-          filename: req.file.originalname || "complaint-image.jpg",
-          path: result.secure_url,
-        },
-      ],
-      
-    }
-  ,  res.status(200).json({ message: "Registered Successfully", subject })).catch(err => {
-      // Log silently — don't crash since response already sent
-      console.error("Email failed (background):", err.message);
+        `,
+        attachments: [
+          {
+            filename: req.file.originalname || "complaint-image.jpg",
+            path: result.secure_url,
+          },
+        ],
+      })
+      .catch((err) => {
+        console.error("Email failed:", err.message);
+      });
+
+    // ✅ 4. Send response ONLY ONCE
+    return res.status(200).json({
+      message: "Registered Successfully",
+      subject,
     });
 
   } catch (err) {
-    return res.status(500).json({ message: err.message || "Something went wrong" });
+    console.error("Server error:", err);
+    return res.status(500).json({
+      message: err.message || "Something went wrong",
+    });
   }
 });
 app.get("/checkAuth", (req, res) => {
