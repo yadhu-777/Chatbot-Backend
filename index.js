@@ -332,13 +332,7 @@ app.get("/news", async (req, res) => {
     res.status(500).send("Error fetching news");
   }
 });
-transporter.verify((error, success) => {
-  if (error) {
-    console.log("Error:", error);
-  } else {
-    console.log("Server is ready to send mail");
-  }
-});
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -346,7 +340,13 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
-
+transporter.verify((error, success) => {
+  if (error) {
+    console.log("Error:", error);
+  } else {
+    console.log("Server is ready to send mail");
+  }
+});
 app.post("/complaint", upload.single("image"), async (req, res) => {
   try {
     const { subject, description } = req.body;
