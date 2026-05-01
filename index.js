@@ -340,7 +340,6 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
-
     if (!subject || !description) {
       return res.status(400).json({ message: "Subject and description are required" });
     }
@@ -353,7 +352,7 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
           (error, result) => {
             if (result) resolve(result);
             else reject(error);
-          },
+          }
         );
         streamifier.createReadStream(req.file.buffer).pipe(stream);
       });
@@ -363,12 +362,16 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
 
     // 2. Save complaint to DB
     const saveComplaint = new ComplaintModel({
-      subject: subject,
-      description: description,
+      subject,
+      description,
       image: result.secure_url,
     });
     await saveComplaint.save();
 
+    // ✅ 3. Respond IMMEDIATELY — don't wait for email
+    res.status(200).json({ message: "Registered Successfully", subject });
+
+    // 4. Send email IN BACKGROUND (fire and forget)
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
@@ -380,8 +383,7 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
       family: 4,
     });
 
-    // 3. Send email with image attachment
-    await transporter.sendMail({
+    transporter.sendMail({
       from: `"Complaint System" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
       subject: `New Complaint: ${subject}`,
@@ -406,11 +408,8 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
           </table>
           <div style="margin-top: 24px;">
             <p style="font-weight: bold; color: #555; margin-bottom: 8px;">Attached Image:</p>
-            <img 
-              src="${result.secure_url}" 
-              alt="Complaint Image"
-              style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px;"
-            />
+            <img src="${result.secure_url}" alt="Complaint Image"
+              style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px;" />
           </div>
           <p style="margin-top: 24px; font-size: 12px; color: #999;">
             This is an automated email from the Complaint Management System.
@@ -423,9 +422,11 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
           path: result.secure_url,
         },
       ],
+    }).catch(err => {
+      // Log silently — don't crash since response already sent
+      console.error("Email failed (background):", err.message);
     });
 
-    return res.status(200).json({ message: "Registered Successfully", subject: subject });
   } catch (err) {
     return res.status(500).json({ message: err.message || "Something went wrong" });
   }
