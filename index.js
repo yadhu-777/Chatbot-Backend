@@ -395,7 +395,7 @@ app.post("/complaint", upload.single("image"), async (req, res) => {
     // ✅ 3. Send email in background (Resend)
     resend.emails
       .send({
-        from: process.env.EMAIL_USER   , // 🔥 use this for testing
+        from: "onboarding@resend.dev", // 🔥 use this for testing
         to: process.env.EMAIL_USER,
         subject: `New Complaint: ${subject}`,
         html: `
