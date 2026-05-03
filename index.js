@@ -34,7 +34,7 @@ cloudinary.config({
   api_key: process.env.api_key,
   api_secret: process.env.api_secret,
 });
-
+import NoticeModel from "./Schema/Notice.js";
 import nodemailer from "nodemailer";
 import { Resend } from "resend";
 
@@ -169,6 +169,40 @@ app.delete("/pdf2/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+app.post("/addNotice", upload.single("image"), async (req, res) => {
+  try {
+  
+
+    if (!req.file) {
+      return res.json({ message: "No file uploaded" });
+    }
+
+    const streamUpload = () => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "notice" },
+          (error, result) => {
+            if (result) resolve(result);
+            else reject(error);
+          },
+        );
+
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+    };
+
+    const result = await streamUpload();
+
+    await NoticeModel.create({
+    
+      image: result.secure_url,
+    });
+
+    res.json({ message: "Image Added Successfully" });
+  } catch (err) {
+    res.json({ message: err.message });
+  }
+});
 app.post("/addImage", upload.single("image"), async (req, res) => {
   try {
     const { name } = req.body;
@@ -201,6 +235,26 @@ app.post("/addImage", upload.single("image"), async (req, res) => {
     res.json({ message: "Image Added Successfully" });
   } catch (err) {
     res.json({ message: err.message });
+  }
+});
+app.post("/getNotice", async (req, res) => {
+  try {
+    const getHighlight = await NoticeModel.find({});
+    if (!getHighlight) {
+      return res.json({ message: "Error during fetch" });
+    }
+    return res.json({ message: getHighlight });
+  } catch (err) {
+    return res.json({ message: err.message });
+  }
+});
+app.post("/delNotice", async (req, res) => {
+  try {
+    const { img } = req.body;
+    const delHighlight = await highlight.deleteOne({ image: img });
+    return res.json({ message: "Deleted" });
+  } catch (err) {
+    return res.json({ message: err.message });
   }
 });
 
