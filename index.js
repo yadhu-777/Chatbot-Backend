@@ -203,7 +203,7 @@ app.post("/addNotice", upload.single("image"), async (req, res) => {
     res.json({ message: err.message });
   }
 });
-app.post("/addImage", upload.single("image"), async (req, res) => {
+app.post("/addNotice", upload.single("image"), async (req, res) => {
   try {
     const { name } = req.body;
 
