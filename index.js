@@ -251,7 +251,7 @@ app.post("/getNotice", async (req, res) => {
 app.post("/delNotice", async (req, res) => {
   try {
     const { id } = req.body;
-    const delHighlight = await highlight.deleteOne({ image: id });
+    const delHighlight = await NoticeModel.deleteOne({ image: id });
     return res.json({ message: "Deleted" });
   } catch (err) {
     return res.json({ message: err.message });
