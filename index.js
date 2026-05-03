@@ -171,7 +171,7 @@ app.delete("/pdf2/:id", async (req, res) => {
 });
 app.post("/addNotice", upload.single("image"), async (req, res) => {
   try {
-  
+  const {name} = req.body;
 
     if (!req.file) {
       return res.json({ message: "No file uploaded" });
@@ -203,7 +203,7 @@ app.post("/addNotice", upload.single("image"), async (req, res) => {
     res.json({ message: err.message });
   }
 });
-app.post("/addNotice", upload.single("image"), async (req, res) => {
+app.post("/addImage", upload.single("image"), async (req, res) => {
   try {
     const { name } = req.body;
 
