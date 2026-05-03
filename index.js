@@ -250,8 +250,8 @@ app.post("/getNotice", async (req, res) => {
 });
 app.post("/delNotice", async (req, res) => {
   try {
-    const { img } = req.body;
-    const delHighlight = await highlight.deleteOne({ image: img });
+    const { id } = req.body;
+    const delHighlight = await highlight.deleteOne({ image: id });
     return res.json({ message: "Deleted" });
   } catch (err) {
     return res.json({ message: err.message });
